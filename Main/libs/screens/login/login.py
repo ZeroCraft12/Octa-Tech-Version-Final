@@ -14,12 +14,17 @@ from kivy.uix.image import Image
 # Mengatur ukuran window
 Window.size = (1000, 600)
 
-class OctaTechApp(MDApp):
+class LoginScreen(MDScreen):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.build()
+
+
     def build(self):
         self.theme_cls.theme_style = "Light"
         
         # 1. Screen Utama
-        screen = MDScreen(md_bg_color=(1, 1, 1, 1))
+        
 
         # 2. Layout Utama (Horizontal)
         main_layout = MDBoxLayout(orientation='horizontal')
@@ -187,6 +192,7 @@ class OctaTechApp(MDApp):
             bold=True
         )
         btn_signup.add_widget(btn_signup_text)
+        btn_signup.bind(on_release = self.go_to_signup)
         
         footer_box.add_widget(footer_label)
         footer_box.add_widget(btn_signup)
@@ -207,12 +213,13 @@ class OctaTechApp(MDApp):
         main_layout.add_widget(right_layout)
 
         # Masukkan Layout Utama ke Screen
-        screen.add_widget(main_layout)
+    def go_to_signup(self, instance):
+        # Fungsi untuk pindah layar
+        self.manager.current = "signup_screen"
+        self.manager.transition.direction = "left"    
         
-        return screen
+        
 
     def login_action(self, instance):
         print("Login button pressed!")
 
-if __name__ == "__main__":
-    OctaTechApp().run()
