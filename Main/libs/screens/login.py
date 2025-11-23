@@ -12,7 +12,7 @@ from kivymd.uix.textfield import MDTextField, MDTextFieldHintText
 from kivy.uix.image import Image
 
 # Mengatur ukuran window
-Window.size = (1000, 600)
+#Window.size = (1000, 600)
 
 class LoginScreen(MDScreen):
     def __init__(self, *args, **kwargs):
@@ -34,12 +34,12 @@ class LoginScreen(MDScreen):
         
         # Gambar Background
         bg_image = FitImage(
-            source= "D:\Project Pemdas Octatech test\Assets\loginpage\Latarbelakang.jpg",
+            source= "D:\Project Pemdas Octatech test\Main\Assets\Images\latar_belakang_login_dummy.jpg",
             radius=[0, 0, 0, 0]
         )
 
         logo = Image(
-            source = "D:\Project Pemdas Octatech test\Assets\loginpage\LogoText.png",
+            source = "D:\Project Pemdas Octatech test\Main\Assets\Images\LogoText.png",
             size = (dp(500), dp(500)),
             size_hint =(None,None),
             pos_hint={'center_x': 0.5, 'center_y': 0.5},
@@ -213,6 +213,8 @@ class LoginScreen(MDScreen):
         main_layout.add_widget(right_layout)
 
         # Masukkan Layout Utama ke Screen
+        self.add_widget(main_layout)
+
     def go_to_signup(self, instance):
         # Fungsi untuk pindah layar
         self.manager.current = "signup_screen"

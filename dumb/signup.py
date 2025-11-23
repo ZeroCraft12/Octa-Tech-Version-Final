@@ -102,7 +102,7 @@ class SignupPage(MDApp):
             MDTextFieldHintText(text="Password"),
             MDTextFieldTrailingIcon(icon="eye-off"),
             mode="outlined",
-            # password=True (Fitur password native mungkin berbeda di 2.0 dev, 
+            password=True # (Fitur password native mungkin berbeda di 2.0 dev, 
             # biasanya perlu logic tambahan untuk masking, tapi kita biarkan default dulu)
         )
 

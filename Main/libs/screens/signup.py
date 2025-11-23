@@ -1,57 +1,54 @@
+import os
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.label import MDLabel
-# Import Widget Baru untuk KivyMD 2.0.0
+# Import Widget KivyMD 2.0.0
 from kivymd.uix.textfield import (
-    MDTextField, 
-    MDTextFieldHintText, 
-    MDTextFieldTrailingIcon, 
+    MDTextField,
+    MDTextFieldHintText,
+    MDTextFieldTrailingIcon,
 )
 from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.fitimage import FitImage
 from kivy.uix.floatlayout import FloatLayout
-from kivy.core.window import Window
-from kivy.metrics import dp
 
-# Mengatur ukuran window agar mirip tampilan mobile
-Window.size = (1000, 600)
+# --- CLASS HALAMAN (MDScreen) ---
+class SignupPage(MDScreen):
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Di dalam Screen, kita gunakan __init__, bukan build.
 
-class SignupPage(MDApp):
-    def build(self):
-        # 1. Tema Dasar
-        self.theme_cls.theme_style = "Dark"
-        self.theme_cls.primary_palette = "Blue"
-
-        screen = MDScreen()
-
-        # 2. Background Image
-        # Pastikan ada file gambar atau hapus baris ini jika error gambar
-        bg_image = FitImage(
-            source="D:\Project Pemdas Octatech test\Assets\Sigup.py\latar.jpg",
-            radius=[0, 0, 0, 0]
-            
-            ) 
-        screen.add_widget(bg_image) 
+        # 1. Background Image
+        # Saya pakai try-except agar kalau gambar tidak ada, app tidak crash (tetap jalan dengan background warna)
         
-        # Jika tidak ada gambar, kita beri warna background gelap manual agar terlihat
-        screen.md_bg_color = (0.1, 0.1, 0.1, 1) 
+        bg_image = FitImage(
+                # Gunakan r"..." (raw string) untuk path Windows agar backslash aman
+            source=r"D:\Project Pemdas Octatech test\Main\Assets\Images\latar_belakang_signup.jpg",
+            radius=[0, 0, 0, 0]
+            )
+        self.add_widget(bg_image) # Gunakan self, bukan screen
+        
+            # Fallback warna jika gambar gagal load
+        self.md_bg_color = (0.1, 0.1, 0.1, 1)
 
         layout_utama = FloatLayout()
 
-        # 3. Membuat Card
+        # 2. Membuat Card
         card = MDCard(
             style="elevated",
             size_hint=(None, None),
-            size=("300dp", "500dp"),
+            size=("300dp", "550dp"), # Tinggi sedikit ditambah agar muat
             pos_hint={"center_x": 0.5, "center_y": 0.5},
-            md_bg_color=(13/255, 23/255, 42/255, 1), # Warna Biru Gelap Hex #0D172A
+            theme_bg_color="Custom",
+            md_bg_color="#106EBE",
             padding="20dp",
             radius=[30],
         )
 
-        # 4. Konten dalam Card
+        # 3. Konten dalam Card
         card_content = MDBoxLayout(
             orientation="vertical",
             spacing="15dp",
@@ -59,7 +56,7 @@ class SignupPage(MDApp):
             adaptive_height=True
         )
 
-        # --- WIDGETS (Syntax KivyMD 2.0) ---
+        # --- WIDGETS ---
 
         # Judul
         label_title = MDLabel(
@@ -83,46 +80,57 @@ class SignupPage(MDApp):
             adaptive_height=True
         )
 
-        # Input Nama (Struktur Baru)
+        # Input Nama
         input_nama = MDTextField(
             MDTextFieldHintText(text="Nama"),
             MDTextFieldTrailingIcon(icon="account"),
-            mode="outlined",
+            mode="filled",
+            theme_bg_color="Custom",
+            fill_color_normal=(1, 1, 1, 1),
+            fill_color_focus=(1, 1, 1, 1),
+            radius=[10, 10, 10, 10]
         )
 
         # Input Username
         input_username = MDTextField(
             MDTextFieldHintText(text="Username"),
             MDTextFieldTrailingIcon(icon="at"),
-            mode="outlined",
+            mode="filled",
+            theme_bg_color="Custom",
+            fill_color_normal=(1, 1, 1, 1),
+            fill_color_focus=(1, 1, 1, 1),
+            radius=[10, 10, 10, 10]
+            
         )
 
         # Input Password
         input_password = MDTextField(
             MDTextFieldHintText(text="Password"),
             MDTextFieldTrailingIcon(icon="key"),
-            mode="outlined",
-            # password=True (Fitur password native mungkin berbeda di 2.0 dev, 
-            # biasanya perlu logic tambahan untuk masking, tapi kita biarkan default dulu)
+            mode="filled",
+            theme_bg_color="Custom",
+            fill_color_normal=(1, 1, 1, 1),
+            fill_color_focus=(1, 1, 1, 1),
+            radius=[10, 10, 10, 10],
+            password=True
+            
         )
 
-        # Tombol Buat Akun (Struktur Baru: MDButton)
-        # style="filled" memberikan warna solid sesuai primary color
+        # Tombol Buat Akun
         btn_signup = MDButton(
             MDButtonText(
                 text="Buat Akun",
                 theme_text_color="Custom",
-                text_color=(1, 1, 1, 1), # Teks putih
+                text_color=(1, 1, 1, 1),
                 pos_hint={"center_x": 0.5, "center_y": 0.5}
             ),
             style="filled",
             pos_hint={"center_x": 0.5},
             height="40dp",
-            size_hint_x=1, # Lebar penuh
+            size_hint_x=1,
         )
 
         # --- MENYUSUN LAYOUT ---
-        
         card_content.add_widget(label_title)
         card_content.add_widget(label_subtitle)
         card_content.add_widget(MDLabel(text="", size_hint_y=None, height="10dp")) # Spacer
@@ -134,11 +142,23 @@ class SignupPage(MDApp):
         card_content.add_widget(MDLabel(text="", size_hint_y=None, height="20dp")) # Spacer
         card_content.add_widget(btn_signup)
 
+        # Tombol Kembali
+        btn_back = MDButton(style="text", pos_hint={"center_x": .5})
+        btn_back.add_widget(MDButtonText(text="Kembali ke Login", theme_text_color="Custom", text_color=(1,1,1,0.7)))
+        btn_back.bind(on_release=self.back_to_login)
+        card_content.add_widget(btn_back)
+
         card.add_widget(card_content)
         layout_utama.add_widget(card)
-        screen.add_widget(layout_utama)
+        
+        # Masukkan layout utama ke dalam screen (self)
+        self.add_widget(layout_utama)
 
-        return screen
-
-if __name__ == "__main__":
-    SignupPage().run()
+    def back_to_login(self, instance):
+        # Cek apakah ScreenManager ada sebelum mengaksesnya
+        if self.manager:
+            self.manager.current = "login_screen"
+            self.manager.transition.direction = "right"
+        else:
+            print("Screen Manager belum dipasang, tombol diklik.")
+    

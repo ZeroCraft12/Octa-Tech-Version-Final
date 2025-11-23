@@ -1,5 +1,15 @@
-from libs.screens.login.login import log
-l = Log
+import sys
+import os
+
+# Jika file dijalankan langsung (python Main/main.py), tambahkan folder project root
+# ke sys.path supaya impor absolut `Main.*` ditemukan.
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+
+from Main.libs.screens.login import LoginScreen
+from Main.libs.screens.signup import SignupPage
+from Main.libs.screens.firstpage import GadgetHomeScreen
 
 
 from kivy.core.window import Window
@@ -27,8 +37,11 @@ class OctaTechApp(MDApp):
         sm = MDScreenManager()
         
         # Tambahkan layar-layar ke manager
+        sm.add_widget(GadgetHomeScreen(name ="first_page"))
+
         sm.add_widget(LoginScreen(name="login_screen"))
-        sm.add_widget(SignupScreen(name="signup_screen"))
+
+        sm.add_widget(SignupPage(name="signup_screen"))
         
         return sm
 
