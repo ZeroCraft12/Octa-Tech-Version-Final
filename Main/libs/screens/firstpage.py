@@ -27,9 +27,9 @@ class GadgetHomeScreen(MDScreen):
         # Gunakan folder Assets/Images di dalam `Main`
         IMG_DIR = os.path.join(MAIN_DIR, "Assets", "Images")
         self.images = [
-            os.path.join(IMG_DIR, "latar_belakang_login_dummy.jpg"),
-            os.path.join(IMG_DIR, "latar_belakang_login_dummy.jpg"),
-            os.path.join(IMG_DIR, "latar_belakang_login_dummy.jpg")
+            os.path.join(IMG_DIR, "D:\Project Pemdas Octatech test\Main\Assets\Images\image (5).png"),
+            os.path.join(IMG_DIR, "D:\Project Pemdas Octatech test\Main\Assets\Images\image (7).png"),
+            os.path.join(IMG_DIR, "D:\Project Pemdas Octatech test\Main\Assets\Images\image (8).png")
         ]
         
         # Background gradient
