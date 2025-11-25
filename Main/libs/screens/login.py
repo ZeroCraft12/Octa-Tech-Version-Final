@@ -248,7 +248,7 @@ class LoginScreen(MDScreen):
     def do_login(self, instance):
         # LOGIKA DB ADA DI SINI
         username = self.username_field.text
-        password = self.username_field.text
+        password = self.password_field.text
 
         with sqlite3.connect(DB_NAME) as conn:
             cursor = conn.cursor()
@@ -257,6 +257,12 @@ class LoginScreen(MDScreen):
 
         if result:
             # Jika sukses, pindah ke screen data_app
+            # result tuple: (id, nama, username, password)
+            nama_user = result[1]
+            # SIMPAN ke app untuk dikirim ke HomeScreen
+            MDApp.get_running_app().user_nama = nama_user
+
+            # Pindah ke home screen
             self.manager.current = "home_screen"
             self.password_field.text = ""
         else:

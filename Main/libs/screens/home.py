@@ -16,12 +16,22 @@ from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivymd.uix.button import MDIconButton
+# Tambahkan import ini
+from kivy.uix.image import Image
+from kivy.uix.behaviors import ButtonBehavior
+
+# Buat Class Tombol Gambar Sendiri (Lebih Stabil daripada MDIconButton untuk Logo)
+class LogoButton(ButtonBehavior, Image):
+    pass
 
 # --- WARNA ---
 COLOR_OCTA_BLUE = get_color_from_hex("#1A2B58") # Biru Tua Pekat
 COLOR_BG_GREY = get_color_from_hex("#F5F5F5")   # Abu-abu Background
 COLOR_WHITE = get_color_from_hex("#FFFFFF")     # Putih Bersih
 
+
+class LogoButton(ButtonBehavior, Image):
+    pass
 # --- 1. HEADER BUTTON ---
 class HeaderButton(ButtonBehavior, MDBoxLayout):
     def __init__(self, icon_name, text_label, callback_func, **kwargs):
@@ -37,7 +47,7 @@ class HeaderButton(ButtonBehavior, MDBoxLayout):
             theme_icon_color="Custom",
             icon_color=COLOR_WHITE,
             pos_hint={"center_x": 0.5},
-            font_size="28sp", 
+            font_size="30sp", 
         )
         
         lbl_text = MDLabel(
@@ -125,10 +135,38 @@ class HomeScreen(MDScreen):
         )
         
         # Logo Kiri
+        # Jangan gunakan adaptive_width=True di logo_box agar ukuran ikon bisa diatur eksplisit
+        logo_box = MDBoxLayout(orientation='horizontal', spacing=dp(5))
+        # Tetapkan ukuran eksplisit untuk ikon agar dapat diperbesar
+        # --- GANTI BAGIAN LOGO_ICON DENGAN INI ---
         
-        logo_box = MDBoxLayout(orientation='horizontal', spacing=dp(5), adaptive_width=True)
-        logo_icon = MDIconButton(icon="hexagon-outline", icon_color=COLOR_WHITE, theme_icon_color="Custom", font_size="36sp", pos_hint={"center_y": 0.5})
-        logo_text = MDLabel(text="Octa\nTech.", theme_text_color="Custom", text_color=COLOR_WHITE, bold=True, adaptive_size=True, pos_hint={"center_y": 0.5})
+        # Kita pakai LogoButton buatan sendiri agar ukuran bisa diatur bebas
+        logo_icon = LogoButton(
+            # Ganti backslash (\) dengan slash (/) agar tidak warning SyntaxError
+            source="D:/Project Pemdas Octatech test/Main/Assets/Images/logonontext.png",
+            
+            # Ukuran tombol dan gambar
+            size_hint=(None, None),
+            size=(dp(60), dp(60)), 
+            
+            # Posisi
+            pos_hint={"center_y": 0.5},
+            
+            # (Opsional) Jika ingin warna asli gambar, hapus baris color ini
+            # Jika logo aslinya hitam dan mau jadi putih, biarkan ini:
+            color=COLOR_WHITE 
+        )
+        
+        # Tambahkan fungsi ketika diklik (jika perlu)
+        logo_icon.on_release = lambda: print("Logo ditekan!")
+        logo_text = MDLabel(
+            text="Octa\nTech.",
+            theme_text_color="Custom",
+            text_color=COLOR_WHITE,
+            bold=True,
+            adaptive_size=True,
+            pos_hint={"center_y": 0.5}
+        )
         logo_box.add_widget(logo_icon)
         logo_box.add_widget(logo_text)
         
@@ -158,7 +196,16 @@ class HomeScreen(MDScreen):
         
         body_content.add_widget(MDLabel(size_hint_y=None, height=dp(10)))
         
-        lbl_hello = MDLabel(text="Halo, nama!", halign="center", font_style="Headline", role="medium", bold=True, adaptive_height=True, theme_text_color="Primary")
+        self.lbl_hello = MDLabel(
+            text="Halo, nama!",
+            halign="center",
+            font_style="Headline",
+            role="medium",
+            bold=True,
+            adaptive_height=True,
+            theme_text_color="Primary"
+)
+
         lbl_desc = MDLabel(text="Selamat datang di aplikasi Octa Tech.\nSilakan pilih menu di bawah ini.", halign="center", theme_text_color="Secondary", adaptive_height=True)
         
         # GRID MENU (4 Kolom)
@@ -175,7 +222,7 @@ class HomeScreen(MDScreen):
         menu_grid.add_widget(MenuCard("star-outline", "Review"))
         menu_grid.add_widget(MenuCard("heart-outline", "Wishlist"))
         
-        body_content.add_widget(lbl_hello)
+        body_content.add_widget(self.lbl_hello)
         body_content.add_widget(lbl_desc)
         body_content.add_widget(menu_grid)
         
@@ -192,4 +239,10 @@ class HomeScreen(MDScreen):
     def do_logout(self, instance):
         print("Logout...")
         MDApp.get_running_app().stop()
+
+    def on_pre_enter(self):
+       app = MDApp.get_running_app()
+       if hasattr(app, "user_nama"):
+        self.lbl_hello.text = f"Halo, {app.user_nama}!"
+
 
