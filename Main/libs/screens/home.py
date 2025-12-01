@@ -69,7 +69,7 @@ class HeaderButton(ButtonBehavior, MDBoxLayout):
 
 # --- 2. MENU CARD (FIX WARNA) ---
 class MenuCard(MDCard):
-    def __init__(self, icon_name, title_text, **kwargs):
+    def __init__(self, icon_name, title_text, on_tap=None, **kwargs):
         super().__init__(**kwargs)
         
         # --- PERBAIKAN UTAMA ---
@@ -115,6 +115,10 @@ class MenuCard(MDCard):
         layout.add_widget(MDLabel()) # Spacer
         
         self.add_widget(layout)
+        
+        # Bind click handler if provided
+        if on_tap:
+            self.bind(on_release=on_tap)
 
 # --- HALAMAN UTAMA ---
 class HomeScreen(MDScreen):
@@ -224,7 +228,7 @@ class HomeScreen(MDScreen):
         
         # ISI CARD (Harusnya sekarang Biru Tua)
         menu_grid.add_widget(MenuCard("checkbox-marked-circle-outline", "Rekomendasi"))
-        menu_grid.add_widget(MenuCard("piggy-bank-outline", "Tabungan"))
+        menu_grid.add_widget(MenuCard("piggy-bank-outline", "Tabungan", on_tap=self.to_savings))
         menu_grid.add_widget(MenuCard("star-outline", "Review"))
         menu_grid.add_widget(MenuCard("heart-outline", "Wishlist"))
         
@@ -247,6 +251,12 @@ class HomeScreen(MDScreen):
             print("DEBUG: Navigasi ke profile_screen berhasil")
         else:
             print("DEBUG: ERROR - manager None!")
+    
+    def to_savings(self, instance):
+        """Navigate to the savings screen."""
+        if self.manager:
+            self.manager.current = "savings_screen"
+            self.manager.transition.direction = "left"
         
     def do_logout(self, instance):
         print("Logout...")

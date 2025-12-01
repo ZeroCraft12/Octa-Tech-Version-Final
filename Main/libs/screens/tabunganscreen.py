@@ -1,5 +1,5 @@
 from kivy.lang import Builder
-from kivymd.app import MDApp
+from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button import MDButton, MDButtonText
 # Perbaikan: Hapus MDDialogContent dari import karena tidak dikenali di versi Anda
@@ -7,6 +7,9 @@ from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogButtonCont
 from kivymd.uix.list import MDListItem
 from kivy.properties import StringProperty, NumericProperty, ListProperty
 from datetime import datetime
+
+# Load the KV file at module import time
+Builder.load_file('Main/libs/screens/savingsscreen.kv')
 
 class HistoryItem(MDListItem):
     amount_text = StringProperty()
@@ -16,7 +19,7 @@ class HistoryItem(MDListItem):
 class EditGoalContent(MDBoxLayout):
     pass
 
-class SavingsApp(MDApp):
+class SavingsScreen(MDScreen):
     goal_name = StringProperty('iPhone 15 Pro')
     target_amount = NumericProperty(15000000)
     current_amount = NumericProperty(6000000)
@@ -27,14 +30,9 @@ class SavingsApp(MDApp):
         {'amount': 25000, 'date': '2024-11-28'},
     ])
 
-    def build(self):
-        self.theme_cls.theme_style = "Light"
-        self.theme_cls.primary_palette = "Purple"
-        return Builder.load_file('saving_goals.kv')
-
-    def on_start(self):
+    def on_enter(self):
         quick_amounts = [10000, 25000, 50000, 100000, 250000, 500000]
-        grid = self.root.ids.quick_grid
+        grid = self.ids.quick_grid
         grid.clear_widgets()
         
         for amt in quick_amounts:
@@ -58,7 +56,7 @@ class SavingsApp(MDApp):
         else:
             self.progress_percent = 0
             
-        history_container = self.root.ids.history_list
+        history_container = self.ids.history_list
         history_container.clear_widgets()
         
         for item in self.history_data:
@@ -81,7 +79,7 @@ class SavingsApp(MDApp):
         self.update_ui()
 
     def add_manual_deposit(self):
-        field = self.root.ids.input_amount
+        field = self.ids.input_amount
         try:
             amount = int(field.text)
             if amount > 0:

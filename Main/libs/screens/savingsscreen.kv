@@ -33,7 +33,7 @@
             text: "Target Jumlah"
 
 # Layar Utama
-MDScreen:
+<SavingsScreen>:
     md_bg_color: [0.98, 0.96, 1, 1]
 
     MDScrollView:
@@ -59,7 +59,7 @@ MDScreen:
                     pos_hint: {"center_y": .5}
                     theme_width: "Custom"
                     width: "180dp"
-                    on_release: app.back_to_home()
+                    on_release: root.back_to_home()
                     MDButtonIcon:
                         icon: "home-outline"
                         theme_icon_color: "Custom"
@@ -99,7 +99,7 @@ MDScreen:
                             pos_hint: {"center_y": .5}
                             
                         MDLabel:
-                            text: app.goal_name
+                            text: root.goal_name
                             font_style: "Headline"
                             role: "small"
                             bold: True
@@ -109,12 +109,12 @@ MDScreen:
                         MDButton:
                             style: "text"
                             pos_hint: {"center_y": .5}
-                            on_release: app.open_edit_dialog()
+                            on_release: root.open_edit_dialog()
                             MDButtonIcon:
                                 icon: "pencil"
 
                     MDLabel:
-                        text: f"Target: {app.format_rupiah(app.target_amount)}"
+                        text: f"Target: {root.format_rupiah(root.target_amount)}"
                         theme_text_color: "Secondary"
                         adaptive_height: True
 
@@ -126,7 +126,7 @@ MDScreen:
                         spacing: "5dp"
                         
                         MDLabel:
-                            text: f"{int(app.progress_percent)}%"
+                            text: f"{int(root.progress_percent)}%"
                             halign: "center"
                             font_style: "Display"
                             role: "large"
@@ -157,7 +157,7 @@ MDScreen:
                                 font_style: "Label"
                                 role: "medium"
                             MDLabel:
-                                text: app.format_rupiah(app.current_amount)
+                                text: root.format_rupiah(root.current_amount)
                                 halign: "center"
                                 bold: True
                                 theme_text_color: "Custom"
@@ -172,7 +172,7 @@ MDScreen:
                                 font_style: "Label"
                                 role: "medium"
                             MDLabel:
-                                text: app.format_rupiah(app.target_amount - app.current_amount)
+                                text: root.format_rupiah(root.target_amount - root.current_amount)
                                 halign: "center"
                                 bold: True
                                 theme_text_color: "Custom"
@@ -205,7 +205,7 @@ MDScreen:
 
                         MDButton:
                             style: "filled"
-                            on_release: app.add_manual_deposit()
+                            on_release: root.add_manual_deposit()
                             MDButtonText:
                                 text: "Tambah"
 
@@ -225,7 +225,7 @@ MDScreen:
                         theme_bg_color: "Custom"
                         md_bg_color: [1, 0.9, 0.7, 1]
                         size_hint_x: 0.5
-                        on_release: app.withdraw_money()
+                        on_release: root.withdraw_money()
                         MDButtonText:
                             text: "Withdraw"
                             theme_text_color: "Custom"
@@ -236,7 +236,7 @@ MDScreen:
                         theme_bg_color: "Custom"
                         md_bg_color: [1, 0.8, 0.8, 1]
                         size_hint_x: 0.5
-                        on_release: app.reset_data()
+                        on_release: root.reset_data()
                         MDButtonText:
                             text: "Reset"
                             theme_text_color: "Custom"
