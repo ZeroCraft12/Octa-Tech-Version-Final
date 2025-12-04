@@ -16,6 +16,7 @@ from kivy.properties import ListProperty
 from Main.libs.screens.reviewscreen import ReviewScreen, DetailScreen, ProductCard, INITIAL_PRODUCTS
 from Main.libs.screens.tabunganscreen import SavingsScreen
 from Main.libs.screens.rekomendasi_gadget import GadgetRecommendationScreen
+from Main.libs.screens.wishlistscreen import WishlistScreen
 #from Main.libs.screens.profil import ProfileScreen
 
 
@@ -65,6 +66,7 @@ class OctaTechApp(MDApp):
 
         self.sm.add_widget(GadgetRecommendationScreen(name="rekomendasi_gadget"))
 
+        self.sm.add_widget(WishlistScreen(name="wishlist_screen"))
         #self.root.add_widget(GadgetRecommendationScreen(name='rekomendasi_gadget'))
         Builder.load_file("Main/libs/screens/profile.kv")
         from Main.libs.screens.profilescreen import ProfileScreen

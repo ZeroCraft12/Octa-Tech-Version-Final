@@ -230,7 +230,7 @@ class HomeScreen(MDScreen):
         menu_grid.add_widget(MenuCard("checkbox-marked-circle-outline", "Rekomendasi", on_tap=self.to_rekomendasi))
         menu_grid.add_widget(MenuCard("piggy-bank-outline", "Tabungan", on_tap=self.to_savings))
         menu_grid.add_widget(MenuCard("star-outline", "Review", on_tap=self.to_review))
-        menu_grid.add_widget(MenuCard("heart-outline", "Wishlist"))
+        menu_grid.add_widget(MenuCard("heart-outline", "Wishlist", on_tap=self.to_wishlist))
         
         body_content.add_widget(self.lbl_hello)
         body_content.add_widget(lbl_desc)
@@ -269,7 +269,13 @@ class HomeScreen(MDScreen):
         if self.manager:
             self.manager.current = "savings_screen"
             self.manager.transition.direction = "left"
-        
+    
+    def to_wishlist(self, instance):
+        """Navigate to the wishlist screen."""
+        if self.manager:
+            self.manager.current = "wishlist_screen"
+            self.manager.transition.direction = "left"
+
     def do_logout(self, instance):
         print("Logout...")
         MDApp.get_running_app().stop()

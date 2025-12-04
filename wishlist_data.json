@@ -1,0 +1,40 @@
+[
+    {
+        "No": 1,
+        "Brand": "Acer",
+        "Nama": "Aspire Lite AL14-51M",
+        "CPU": "Intel Core i3-1215U",
+        "GPU": "Intel UHD Graphics",
+        "RAM": "8GB DDR5-4800MHz (1x Slot SODIMM, Upgradeable up to 16GB/32GB, Single Channel)",
+        "Storage": "256GB / 512GB NVMe Gen 3/4 (Upgradeable, 1 Slot)",
+        "Layar": "14\" WUXGA (1920x1200), IPS, 60Hz, Aspek rasio 16:10",
+        "Sound": "Stereo",
+        "Baterai": "45.6 Wh, Charger 45W",
+        "Bobot": "1.35 kg ",
+        "Bahan": "Polikarbonat",
+        "Bundle": "Windows 11 Home + OHS 2021",
+        "Harga": "Rp 6.200.000 - 7.500.000",
+        "CleanPrice": 6200000,
+        "CleanRAM": 8,
+        "CleanStorage": 256
+    },
+    {
+        "No": 6,
+        "Brand": "Axioo",
+        "Nama": "MyBook Hype 5 Gen 12",
+        "CPU": "Intel Core i5-1235U ",
+        "GPU": "Intel Iris Xe Eligible",
+        "RAM": "8GB DDR4 (Onboard, ada 1 slot kosong SODIMM  untuk upgrade)",
+        "Storage": "512GB NVMe",
+        "Layar": "14\" IPS Full HD",
+        "Sound": "Stereo",
+        "Baterai": "45 Wh",
+        "Bobot": "1.40 kg",
+        "Bahan": "Polikarbonat",
+        "Bundle": "Windows 11 Home + OHS 2021",
+        "Harga": "Rp 5.500.000 - 6.000.000",
+        "CleanPrice": 5500000,
+        "CleanRAM": 8,
+        "CleanStorage": 512
+    }
+]
