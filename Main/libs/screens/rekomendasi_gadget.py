@@ -1,59 +1,65 @@
 import os
 import pandas as pd
 import re
+import webbrowser
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.screenmanager import MDScreenManager
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.button import MDButton, MDButtonText, MDButtonIcon
-from kivymd.uix.list import MDListItem, MDListItemHeadlineText, MDListItemSupportingText, MDListItemTertiaryText, MDListItemLeadingIcon
+from kivymd.uix.button import MDButton, MDButtonText, MDButtonIcon, MDIconButton
+from kivymd.uix.card import MDCard
+from kivymd.uix.fitimage import FitImage
+from kivymd.uix.label import MDLabel
+from kivymd.uix.widget import MDWidget
 from kivy.metrics import dp
+from kivy.properties import StringProperty
 from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
 
 # ==========================================
-# 1. DATA HANDLER (Backend Logic)
+# 1. DATA HANDLER
 # ==========================================
 class GadgetDataManager:
     def __init__(self, csv_path=None):
         self.df = pd.DataFrame()
+        target_filename = 'database(Laptop).csv'
         
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        path1 = os.path.join(current_dir, 'dumb database.csv')
-        cwd = os.getcwd()
-        path2 = os.path.join(cwd, 'dumb database.csv')
-        path3 = os.path.join(cwd, 'Main', 'libs', 'screens', 'dumb database.csv')
+        possible_paths = [
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), target_filename),
+            os.path.join(os.getcwd(), target_filename),
+            os.path.join(os.getcwd(), 'Main', 'libs', 'screens', target_filename)
+        ]
+        if csv_path: possible_paths.insert(0, csv_path)
 
         self.final_path = None
-        if csv_path and os.path.exists(csv_path):
-            self.final_path = csv_path
-        elif os.path.exists(path1):
-            self.final_path = path1
-        elif os.path.exists(path2):
-            self.final_path = path2
-        elif os.path.exists(path3):
-            self.final_path = path3
+        for path in possible_paths:
+            if os.path.exists(path):
+                self.final_path = path
+                break
 
         if self.final_path:
             try:
-                self.df = pd.read_csv(self.final_path)
+                self.df = pd.read_csv(self.final_path, sep=';')
                 self.df.columns = self.df.columns.str.strip()
+                if 'Image 3' in self.df.columns:
+                    self.df.rename(columns={'Image 3': 'Image3'}, inplace=True)
+
                 if 'Harga' in self.df.columns:
                     self.df['CleanPrice'] = self.df['Harga'].apply(self._clean_price)
                 if 'RAM' in self.df.columns:
                     self.df['CleanRAM'] = self.df['RAM'].apply(self._clean_ram)
                 if 'Storage' in self.df.columns:
                     self.df['CleanStorage'] = self.df['Storage'].apply(self._clean_storage)
-                print(f"DEBUG: Sukses load database. Jumlah baris: {len(self.df)}")
+                
+                print(f"DEBUG: Sukses load {len(self.df)} produk.")
             except Exception as e:
                 print(f"DEBUG: Error baca CSV: {e}")
         else:
-            print("DEBUG: CSV Database tidak ditemukan.")
+            print("DEBUG: CSV FILE TIDAK DITEMUKAN.")
 
     def _clean_price(self, price_str):
         try:
-            clean_str = str(price_str).replace('Rp', '').replace('.', '').split('-')[0].strip()
-            return int(clean_str)
+            return int(str(price_str).replace('Rp', '').replace('.', '').replace('++', '').split('-')[0].strip())
         except: return 0
 
     def _clean_ram(self, ram_str):
@@ -66,11 +72,9 @@ class GadgetDataManager:
         try:
             s = str(storage_str).upper()
             if 'TB' in s:
-                match = re.search(r'(\d+)\s*TB', s)
-                return int(match.group(1)) * 1024 if match else 0
+                return int(re.search(r'(\d+)\s*TB', s).group(1)) * 1024
             elif 'GB' in s:
-                match = re.search(r'(\d+)\s*GB', s)
-                return int(match.group(1)) if match else 0
+                return int(re.search(r'(\d+)\s*GB', s).group(1))
             return 0
         except: return 0
 
@@ -90,18 +94,80 @@ class GadgetDataManager:
             except: pass
         if storage_size and storage_size != "Semua":
             try:
-                if "TB" in storage_size:
-                    user_storage = int(str(storage_size).replace("TB", "").strip()) * 1024
-                else:
-                    user_storage = int(str(storage_size).replace("GB", "").strip())
-                filtered = filtered[filtered['CleanStorage'] >= user_storage]
+                user_s = int(str(storage_size).replace("GB", "").replace("TB", "").strip())
+                if "TB" in storage_size: user_s *= 1024
+                filtered = filtered[filtered['CleanStorage'] >= user_s]
             except: pass
         return filtered
 
 # ==========================================
-# 2. KV LAYOUT (UI)
+# 2. KV LAYOUT
 # ==========================================
+
 KV = '''
+#:import hex kivy.utils.get_color_from_hex
+
+<GridCardItem>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: "130dp"
+    padding: "10dp"
+    spacing: "15dp"
+    radius: [15]
+    elevation: 1
+    style: "elevated"
+    theme_bg_color: "Custom"
+    md_bg_color: [1, 1, 1, 1]
+    ripple_behavior: True
+    
+    FitImage:
+        source: root.source
+        size_hint: (None, 1)
+        width: self.height
+        radius: [10]
+        
+    MDBoxLayout:
+        orientation: "vertical"
+        pos_hint: {"center_y": .5}
+        adaptive_height: True
+        spacing: "6dp"
+        
+        MDLabel:
+            text: root.product_name
+            font_style: "Title"
+            role: "medium"
+            bold: True
+            adaptive_height: True
+            max_lines: 2
+            shorten: True
+            shorten_from: "right"
+            
+        MDLabel:
+            text: root.cpu_info
+            font_style: "Body"
+            role: "small"
+            theme_text_color: "Secondary"
+            max_lines: 2
+            shorten: True
+            adaptive_height: True
+
+    MDBoxLayout:
+        orientation: "vertical"
+        size_hint_x: None
+        width: "110dp"
+        pos_hint: {"center_y": .5}
+        adaptive_height: True
+        
+        MDLabel:
+            text: root.price
+            font_style: "Label"
+            role: "large"
+            theme_text_color: "Custom"
+            text_color: [0.2, 0.7, 0.2, 1]
+            bold: True
+            halign: "right"
+            adaptive_height: True
+
 <NavHeader@MDBoxLayout>:
     orientation: 'horizontal'
     size_hint_y: None
@@ -118,7 +184,6 @@ KV = '''
         on_release: app.root.get_screen("rekomendasi_gadget").go_to_home() 
         MDButtonIcon:
             icon: "home"
-    
     MDLabel:
         text: "Octa Tech."
         halign: "center"
@@ -128,7 +193,6 @@ KV = '''
         font_style: "Title"
         role: "large"
         pos_hint: {"center_y": .5}
-
     MDButton:
         style: "text"
         theme_icon_color: "Custom"
@@ -141,18 +205,14 @@ KV = '''
 <GadgetStepScreen>:
     MDBoxLayout:
         orientation: 'vertical'
-        md_bg_color: [0.96, 0.96, 0.96, 1]
-        
+        md_bg_color: [0.98, 0.98, 0.98, 1]
         NavHeader:
-        
         MDBoxLayout:
             orientation: 'vertical'
             padding: "20dp"
             spacing: "10dp"
-            
             MDWidget:
                 size_hint_y: 0.1
-            
             MDLabel:
                 id: question_label
                 text: "Pertanyaan?"
@@ -161,10 +221,8 @@ KV = '''
                 role: "medium"
                 bold: True
                 adaptive_height: True
-            
             MDWidget:
                 size_hint_y: 0.05
-            
             MDBoxLayout:
                 size_hint_y: None
                 height: "400dp"
@@ -181,10 +239,8 @@ KV = '''
                             spacing: "15dp"
                             padding: "10dp"
                             adaptive_size: True
-            
             MDWidget:
                 size_hint_y: 0.2
-
             MDAnchorLayout:
                 anchor_x: "right"
                 size_hint_y: None
@@ -199,40 +255,25 @@ KV = '''
     MDBoxLayout:
         orientation: 'vertical'
         md_bg_color: [0.96, 0.96, 0.96, 1]
-        
         NavHeader:
         
         MDBoxLayout:
             orientation: 'vertical'
-            padding: "16dp"
-            
-            MDLabel:
-                text: "Rekomendasi Laptop"
-                halign: "center"
-                font_style: "Headline"
-                role: "small"
-                bold: True
-                size_hint_y: None
-                height: "50dp"
             
             MDBoxLayout:
-                orientation: 'horizontal'
                 adaptive_height: True
-                spacing: "8dp"
-                pos_hint: {"center_x": .5}
-                padding: [0, 0, 0, "10dp"]
-                
+                padding: "16dp"
+                spacing: "10dp"
                 MDLabel:
-                    text: "Urutkan:"
-                    adaptive_size: True
-                    pos_hint: {"center_y": .5}
-                
+                    text: "Hasil Rekomendasi"
+                    font_style: "Headline"
+                    role: "small"
+                    bold: True
                 MDButton:
                     style: "tonal"
                     on_release: root.controller.apply_sort("price_asc")
                     MDButtonText:
                         text: "Termurah"
-                
                 MDButton:
                     style: "tonal"
                     on_release: root.controller.apply_sort("price_desc")
@@ -240,15 +281,21 @@ KV = '''
                         text: "Termahal"
 
             MDScrollView:
-                MDList:
-                    id: result_list
+                do_scroll_x: False
+                bar_width: 0
+                MDGridLayout:
+                    id: result_grid
+                    cols: 1
                     spacing: "12dp"
-                    padding: "12dp"
+                    padding: "16dp"
+                    adaptive_height: True
+                    size_hint_y: None
+                    height: self.minimum_height
 
             MDAnchorLayout:
                 anchor_x: "center"
                 size_hint_y: None
-                height: "80dp"
+                height: "70dp"
                 MDButton:
                     style: "filled"
                     on_release: root.controller.restart_flow()
@@ -258,142 +305,194 @@ KV = '''
 <GadgetDetailScreen>:
     MDBoxLayout:
         orientation: 'vertical'
-        md_bg_color: [0.96, 0.96, 0.96, 1]
-        
+        md_bg_color: [1, 1, 1, 1]
         NavHeader:
         
         MDScrollView:
             MDBoxLayout:
                 orientation: 'vertical'
                 adaptive_height: True
-                padding: "20dp"
-                spacing: "15dp"
+                padding: "0dp"
+                spacing: "0dp"
                 
-                # 1. IMAGE CAROUSEL AREA (Putih)
-                MDCard:
+                # 1. GAMBAR BESAR
+                MDBoxLayout:
                     size_hint_y: None
-                    height: "200dp"
-                    radius: [20, 20, 20, 20]
-                    md_bg_color: [1, 1, 1, 1]
-                    theme_bg_color: "Custom"
-                    elevation: 1
+                    height: "350dp"
+                    md_bg_color: [0.98, 0.98, 0.98, 1]
+                    padding: [10, 10]
                     
-                    MDBoxLayout:
-                        id: image_container
-                        padding: "10dp"
-                        Image:
-                            source: "assets/images/laptop_placeholder.png" # Default placeholder
-                            id: detail_image
-                            keep_ratio: True
-                            allow_stretch: True
+                    MDScrollView:
+                        do_scroll_x: True
+                        do_scroll_y: False
+                        bar_width: 0
+                        
+                        # [FIX] MENGGUNAKAN ID: image_gallery_box (BUKAN CAROUSEL)
+                        MDBoxLayout:
+                            id: image_gallery_box 
+                            orientation: 'horizontal'
+                            adaptive_width: True
+                            spacing: "10dp"
 
-                # 2. TITLE & WISHLIST BUTTON ROW
+                # 2. JUDUL + WISHLIST
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    adaptive_height: True
+                    padding: ["24dp", "10dp"]
+                    spacing: "5dp"
+                    
+                    MDLabel:
+                        id: detail_name
+                        text: "Nama Laptop"
+                        font_style: "Headline"
+                        role: "medium"
+                        bold: True
+                        halign: "center"
+                        adaptive_height: True
+                    
+                    MDIconButton:
+                        icon: "heart-outline"
+                        style: "standard"
+                        pos_hint: {"center_x": .5}
+                        theme_icon_color: "Custom"
+                        icon_color: [1, 0, 0, 1]
+                        on_release: root.controller.add_to_wishlist()
+
+                MDWidget:
+                    size_hint_y: None
+                    height: "10dp"
+
+                # 3. SPLIT CONTAINER
                 MDBoxLayout:
                     orientation: 'horizontal'
                     adaptive_height: True
-                    spacing: "10dp"
-
-                    MDLabel:
-                        id: detail_name
-                        text: "ASUS Vivobook A121106"
-                        font_style: "Headline"
-                        role: "small"
-                        bold: True
-                        adaptive_height: True
-                        pos_hint: {"center_y": .5}
+                    padding: ["20dp", "0dp"]
+                    spacing: "20dp"
                     
-                    # TOMBOL ADD TO WISHLIST (Biru)
+                    # --- KIRI: SPESIFIKASI ---
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        adaptive_height: True
+                        size_hint_x: 0.55
+                        pos_hint: {"top": 1}
+                        
+                        MDLabel:
+                            text: "Spesifikasi:"
+                            font_style: "Title" 
+                            role: "large"
+                            bold: True
+                            adaptive_height: True
+                            valign: "top"
+                            
+                        MDLabel:
+                            id: detail_specs
+                            text: "..."
+                            font_style: "Body"
+                            role: "medium"
+                            theme_text_color: "Secondary"
+                            adaptive_height: True
+                            valign: "top"
+                            
+                    # --- KANAN: HARGA & TOMBOL ---
+                    MDBoxLayout:
+                        orientation: 'vertical'
+                        adaptive_height: True
+                        size_hint_x: 0.45
+                        spacing: "12dp"
+                        pos_hint: {"top": 1}
+                        
+                        MDBoxLayout:
+                            orientation: 'vertical'
+                            adaptive_height: True
+                            spacing: "4dp"
+                            MDLabel:
+                                text: "Estimasi Harga:"
+                                font_style: "Title" 
+                                role: "large"
+                                bold: True
+                                halign: "center"
+                                adaptive_height: True
+                            MDLabel:
+                                id: detail_price
+                                text: "Rp 0"
+                                font_style: "Headline"
+                                role: "small"
+                                halign: "center"
+                                theme_text_color: "Custom"
+                                text_color: [0.2, 0.7, 0.2, 1]
+                                bold: True
+                                adaptive_height: True
+                        
+                        MDButton:
+                            style: "filled"
+                            theme_bg_color: "Custom"
+                            md_bg_color: [0.26, 0.63, 0.28, 1]
+                            size_hint_x: None
+                            width: "130dp"
+                            height: "54dp"
+                            pos_hint: {"center_x": .5}
+                            on_release: root.controller.open_tokped()
+                            MDButtonText:
+                                text: "Tokopedia"
+                                font_style: "Title"
+                                role: "medium"
+                                theme_text_color: "Custom"
+                                text_color: [1,1,1,1]
+                                pos_hint: {"center_x": .5, "center_y": .5}
+
+                        MDButton:
+                            style: "filled"
+                            theme_bg_color: "Custom"
+                            md_bg_color: [0.93, 0.33, 0.18, 1]
+                            size_hint_x: None
+                            width: "130dp"
+                            height: "54dp"
+                            pos_hint: {"center_x": .5}
+                            on_release: root.controller.open_shopee()
+                            MDButtonText:
+                                text: "Shopee"
+                                font_style: "Title"
+                                role: "medium"
+                                theme_text_color: "Custom"
+                                text_color: [1,1,1,1]
+                                pos_hint: {"center_x": .5, "center_y": .5}
+
+                MDWidget:
+                    size_hint_y: None
+                    height: "40dp"
+
+                # 4. TOMBOL KEMBALI
+                MDBoxLayout:
+                    adaptive_height: True
+                    padding: "20dp"
+                    
                     MDButton:
                         style: "filled"
                         theme_bg_color: "Custom"
-                        md_bg_color: [0.2, 0.6, 1, 1] # Biru terang
-                        pos_hint: {"center_y": .5}
-                        on_release: root.controller.save_to_wishlist()
-                        
-                        MDButtonIcon:
-                            icon: "heart-outline"
-                            theme_icon_color: "Custom"
-                            icon_color: [1,1,1,1]
-                        
+                        md_bg_color: [0.1, 0.4, 0.9, 1]
+                        pos_hint: {"center_x": .5}
+                        on_release: root.controller.go_back_to_results()
                         MDButtonText:
-                            text: "Add to wishlist"
+                            text: "Kembali"
                             theme_text_color: "Custom"
                             text_color: [1,1,1,1]
-
-                # 3. CONTENT SPLIT (SPECS LEFT - PRICE RIGHT)
-                MDBoxLayout:
-                    orientation: 'horizontal'
-                    adaptive_height: True
-                    spacing: "15dp"
-                    height: "300dp" # Tinggi fix agar rapi
-
-                    # KIRI: SPESIFIKASI (Abu Gelap)
-                    MDCard:
-                        size_hint_x: 0.5
-                        adaptive_height: True
-                        md_bg_color: [0.75, 0.75, 0.75, 1]
-                        theme_bg_color: "Custom"
-                        radius: [15, 15, 15, 15]
-                        padding: "15dp"
-                        
-                        MDLabel:
-                            id: detail_specs
-                            # PERBAIKAN: Gunakan satu baris string dengan \\n untuk menghindari error parser
-                            text: "Processor: -\\nRAM: -\\nStorage: -"
-                            adaptive_height: True
-                            theme_text_color: "Custom"
-                            text_color: [0.1, 0.1, 0.1, 1]
-
-                    # KANAN: HARGA & LINK (Abu Gelap)
-                    MDCard:
-                        size_hint_x: 0.5
-                        adaptive_height: True
-                        md_bg_color: [0.75, 0.75, 0.75, 1]
-                        theme_bg_color: "Custom"
-                        radius: [15, 15, 15, 15]
-                        padding: "15dp"
-                        orientation: "vertical"
-                        spacing: "10dp"
-
-                        MDLabel:
-                            id: detail_price
-                            text: "Rp -"
-                            font_style: "Headline"
-                            role: "small"
-                            bold: True
-                            halign: "center"
-                            adaptive_height: True
-                        
-                        MDLabel:
-                            text: "Marketplace:"
-                            bold: True
-                            adaptive_height: True
-
-                        MDLabel:
-                            text: "Shopee: Rp -"
-                            font_style: "Label"
-                            role: "small"
-                        MDLabel:
-                            text: "Tokopedia: Rp -"
-                            font_style: "Label"
-                            role: "small"
-                        
-                        MDWidget:
-                        
-                        MDButton:
-                            style: "text"
-                            on_release: root.controller.go_back_to_results()
-                            pos_hint: {"center_x": .5}
-                            MDButtonText:
-                                text: "<< Kembali"
+                            
+                MDWidget:
+                    size_hint_y: None
+                    height: "20dp"
 '''
 
 Builder.load_string(KV)
 
+# ==========================================
+# 3. CONTROLLER & UI LOGIC
+# ==========================================
 
-# ==========================================
-# 3. CONTROLLER & SCREENS
-# ==========================================
+class GridCardItem(MDCard):
+    source = StringProperty("")
+    product_name = StringProperty("")
+    price = StringProperty("")
+    cpu_info = StringProperty("")
 
 class GadgetStepScreen(MDScreen):
     @property
@@ -401,34 +500,23 @@ class GadgetStepScreen(MDScreen):
         return self.manager.parent
 
 class GadgetBudgetScreen(GadgetStepScreen):
-    def on_enter(self):
-        self.controller.setup_budget_ui(self)
+    def on_enter(self): self.controller.setup_budget_ui(self)
 
 class GadgetCPUScreen(GadgetStepScreen):
-    def on_enter(self):
-        self.controller.setup_cpu_ui(self)
+    def on_enter(self): self.controller.setup_cpu_ui(self)
 
 class GadgetRAMScreen(GadgetStepScreen):
-    def on_enter(self):
-        self.controller.setup_ram_ui(self)
+    def on_enter(self): self.controller.setup_ram_ui(self)
 
 class GadgetStorageScreen(GadgetStepScreen):
-    def on_enter(self):
-        self.controller.setup_storage_ui(self)
+    def on_enter(self): self.controller.setup_storage_ui(self)
 
-class GadgetResultScreen(GadgetStepScreen):
-    pass
+class GadgetResultScreen(GadgetStepScreen): pass
+class GadgetDetailScreen(GadgetStepScreen): pass
 
-class GadgetDetailScreen(GadgetStepScreen):
-    pass
-
-# ==========================================
-# 4. MAIN SCREEN (CONTAINER)
-# ==========================================
 class GadgetRecommendationScreen(MDScreen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        
         self.data_manager = GadgetDataManager()
         self.user_choices = {"budget": None, "cpu": None, "ram": None, "storage": None}
         self.current_detail_laptop = None
@@ -444,7 +532,17 @@ class GadgetRecommendationScreen(MDScreen):
         self.step_manager.add_widget(GadgetResultScreen(name='result_screen'))
         self.step_manager.add_widget(GadgetDetailScreen(name='detail_screen'))
 
-    # --- NAVIGASI ---
+    def get_image_path(self, img_name):
+        if not img_name or str(img_name).lower() == 'nan': return ""
+        search_dirs = [os.path.join(os.path.dirname(__file__), 'Laptop'),
+                       os.path.join(os.getcwd(), 'Laptop'), os.path.dirname(__file__)]
+        base_name = os.path.splitext(img_name)[0]
+        for folder in search_dirs:
+            for ext in ['', '.jpg', '.jpeg', '.png', '.webp']:
+                full_path = os.path.join(folder, base_name + ext)
+                if os.path.exists(full_path): return full_path
+        return "" 
+
     def go_to_home(self):
         if self.manager:
             self.manager.current = "home_screen"
@@ -453,7 +551,7 @@ class GadgetRecommendationScreen(MDScreen):
     def restart_flow(self):
         self.user_choices = {"budget": None, "cpu": None, "ram": None, "storage": None}
         self.step_manager.current = "step_budget"
-    
+
     def go_back_to_results(self):
         self.step_manager.current = "result_screen"
         self.step_manager.transition.direction = "right"
@@ -467,159 +565,209 @@ class GadgetRecommendationScreen(MDScreen):
         elif curr == "step_storage":
             self.calculate_recommendation()
             next_scr = "result_screen"
-        
         if next_scr:
             self.step_manager.current = next_scr
             self.step_manager.transition.direction = "left"
 
-    # --- LOGIC DATA & UI SETUP ---
     def save_choice_and_next(self, key, value):
-        print(f"DEBUG: Pilih {key} = {value}")
         self.user_choices[key] = value
         self.next_step()
 
-    def _create_option_button(self, text, callback_value, key_choice, screen_obj, is_grid=False):
-        grid = screen_obj.ids.options_grid
-        grid_btn_w = 140 
-        spacing = 15     
-        total_width = (grid_btn_w * 2) + spacing
-        
-        if is_grid:
-            grid.cols = 2
-            btn_size = (dp(grid_btn_w), dp(grid_btn_w))
-        else:
-            grid.cols = 1
-            btn_size = (dp(total_width), dp(80))
-
-        btn = MDButton(
-            style="outlined",
-            size_hint=(None, None), 
-            size=btn_size,
-        )
-        
-        btn_text = MDButtonText(
-            text=text, 
-            pos_hint={"center_x": .5, "center_y": .5},
-            font_style="Headline",
-            role="small", 
-            halign="center"
-        )
-        btn.add_widget(btn_text)
-        
-        btn.bind(on_release=lambda x: self.save_choice_and_next(key_choice, callback_value))
+    def _create_option_button(self, text, val, key, screen, is_grid=False):
+        grid = screen.ids.options_grid
+        grid.cols = 2 if is_grid else 1
+        btn = MDButton(style="outlined", size_hint_x=1)
+        btn.add_widget(MDButtonText(text=text, pos_hint={"center_x":.5, "center_y":.5}))
+        btn.bind(on_release=lambda x: self.save_choice_and_next(key, val))
         grid.add_widget(btn)
 
-    def setup_budget_ui(self, screen):
-        screen.ids.question_label.text = "Maksimal budget kamu berapa?"
-        screen.ids.options_grid.clear_widgets()
-        options = [
-            ("Rp 1jt - 5jt", (1000000, 5000000)),
-            ("Rp 5jt - 10jt", (5000000, 10000000)),
-            ("Rp 10jt - 15jt", (10000000, 15000000)),
-            ("Rp 15jt - 20jt", (15000000, 20000000)),
-            ("> Rp 20jt", (20000000, 999999999)) 
-        ]
-        for text, val in options:
-            self._create_option_button(text, val, "budget", screen, is_grid=False)
+    def setup_budget_ui(self, scr):
+        scr.ids.question_label.text = "Budget Maksimal?"
+        scr.ids.options_grid.clear_widgets()
+        opts = [("1jt - 5jt", (1000000, 5000000)), ("5jt - 10jt", (5000000, 10000000)), ("10jt - 15jt", (10000000, 15000000)), ("15jt - 20jt", (15000000, 20000000)), ("> 20jt", (20000000, 999999999))]
+        for t, v in opts: self._create_option_button(t, v, "budget", scr)
 
-    def setup_cpu_ui(self, screen):
-        screen.ids.question_label.text = "Mau pakai CPU apa?"
-        screen.ids.options_grid.clear_widgets()
-        options = ["Intel", "AMD", "Semua"]
-        for opt in options:
-            self._create_option_button(opt, opt, "cpu", screen, is_grid=True)
+    def setup_cpu_ui(self, scr):
+        scr.ids.question_label.text = "Pilih CPU"
+        scr.ids.options_grid.clear_widgets()
+        for t in ["Intel", "AMD", "Semua"]: self._create_option_button(t, t, "cpu", scr, True)
 
-    def setup_ram_ui(self, screen):
-        screen.ids.question_label.text = "Butuh RAM berapa?"
-        screen.ids.options_grid.clear_widgets()
-        options = ["4GB", "8GB", "16GB", "32GB", "Semua"]
-        for opt in options:
-            self._create_option_button(opt, opt, "ram", screen, is_grid=True)
+    def setup_ram_ui(self, scr):
+        scr.ids.question_label.text = "Pilih RAM"
+        scr.ids.options_grid.clear_widgets()
+        for t in ["4GB", "8GB", "16GB", "32GB", "Semua"]: self._create_option_button(t, t, "ram", scr, True)
 
-    def setup_storage_ui(self, screen):
-        screen.ids.question_label.text = "Butuh Storage berapa?"
-        screen.ids.options_grid.clear_widgets()
-        options = ["256GB", "512GB", "1TB", "Semua"]
-        for opt in options:
-            self._create_option_button(opt, opt, "storage", screen, is_grid=True)
+    def setup_storage_ui(self, scr):
+        scr.ids.question_label.text = "Pilih Storage"
+        scr.ids.options_grid.clear_widgets()
+        for t in ["256GB", "512GB", "1TB", "Semua"]: self._create_option_button(t, t, "storage", scr, True)
 
-    # --- HASIL & DETAIL ---
     def calculate_recommendation(self):
         self.filtered_df = self.data_manager.filter_laptops(
-            budget_range=self.user_choices['budget'],
-            cpu_type=self.user_choices['cpu'],
-            ram_size=self.user_choices['ram'],
-            storage_size=self.user_choices['storage']
+            self.user_choices['budget'], self.user_choices['cpu'],
+            self.user_choices['ram'], self.user_choices['storage']
         )
         self.display_results(self.filtered_df)
 
     def apply_sort(self, sort_type):
         if self.filtered_df.empty: return
-        sorted_df = self.filtered_df.copy()
-        if sort_type == "price_asc":
-            sorted_df = sorted_df.sort_values(by='CleanPrice', ascending=True)
-        elif sort_type == "price_desc":
-            sorted_df = sorted_df.sort_values(by='CleanPrice', ascending=False)
-        self.display_results(sorted_df)
+        df = self.filtered_df.copy()
+        if sort_type == "price_asc": df = df.sort_values(by='CleanPrice')
+        elif sort_type == "price_desc": df = df.sort_values(by='CleanPrice', ascending=False)
+        self.display_results(df)
 
     def display_results(self, df):
-        result_screen = self.step_manager.get_screen('result_screen')
-        list_container = result_screen.ids.result_list
-        list_container.clear_widgets()
-        
+        grid = self.step_manager.get_screen('result_screen').ids.result_grid
+        grid.clear_widgets()
+
         if df.empty:
-            list_container.add_widget(MDListItem(MDListItemHeadlineText(text="Tidak ditemukan hasil yang cocok.")))
-        else:
-            for index, row in df.iterrows():
-                leading = MDListItemLeadingIcon(icon="laptop")
-                
-                item = MDListItem(
-                    leading,
-                    MDListItemHeadlineText(text=f"{row.get('Brand','')} - {row.get('Nama','')}"[:30]),
-                    MDListItemSupportingText(text=f"Harga: {row.get('Harga','')}"),
-                    MDListItemTertiaryText(text=f"{row.get('CPU','')} | RAM {row.get('RAM','')}")
-                )
-                item.bind(on_release=lambda x, r=row: self.show_detail(r))
-                list_container.add_widget(item)
+            grid.cols = 1
+            grid.add_widget(MDLabel(text="Tidak ada produk yang cocok :(", halign="center"))
+            return
+        
+        grid.cols = 1
+
+        for index, row in df.iterrows():
+            img_name = str(row.get('Image1', ''))
+            final_path = self.get_image_path(img_name)
+            if not final_path: final_path = "https://via.placeholder.com/150"
+
+            card = GridCardItem()
+            card.source = final_path
+            card.product_name = f"{row.get('Brand','')} {row.get('Nama','')}"
+            card.price = str(row.get('Harga', 'Hubungi Penjual'))
+            card.cpu_info = f"{row.get('RAM','')} | {row.get('Storage','')}\n{row.get('CPU','')}"
+            
+            card.bind(on_release=lambda x, r=row: self.show_detail(r))
+            grid.add_widget(card)
 
     def show_detail(self, row):
         self.current_detail_laptop = row
-        detail_screen = self.step_manager.get_screen('detail_screen')
+        scr = self.step_manager.get_screen('detail_screen')
         
-        detail_screen.ids.detail_name.text = str(row.get('Nama', 'Unknown'))
-        detail_screen.ids.detail_price.text = f"Rp {row.get('Harga', '-')}"
+        scr.ids.detail_name.text = str(row.get('Nama', 'Unknown'))
+        scr.ids.detail_price.text = str(row.get('Harga', '-'))
         
-        # Format Spesifikasi
-        specs = f"Proccesor : {row.get('CPU','-')}\n" \
-                f"RAM : {row.get('RAM','-')}\n" \
-                f"GPU : {row.get('GPU','-')}\n" \
-                f"Storage : {row.get('Storage','-')}\n" \
-                f"Layar : {row.get('Layar','-')}"
+        spec_text = ""
+        for key in ['CPU', 'GPU', 'RAM', 'Storage', 'Layar', 'Baterai', 'Bobot']:
+            val = str(row.get(key, '-'))
+            spec_text += f"• {key}: {val}\n\n"
+        scr.ids.detail_specs.text = spec_text
+
+        # [FIX] PENGGUNAAN IMAGE_GALLERY_BOX (SCROLLVIEW) BUKAN CAROUSEL
+        gallery_box = scr.ids.image_gallery_box
+        gallery_box.clear_widgets()
         
-        detail_screen.ids.detail_specs.text = specs
+        has_img = False
+        for col in ['Image1', 'Image2', 'Image3', 'Image4']:
+            path = self.get_image_path(str(row.get(col, '')))
+            if path:
+                # Membuat Kartu Gambar 1x1 Besar (320dp agar sesuai kontainer)
+                img_card = MDCard(
+                    size_hint=(None, None),
+                    size=("320dp", "320dp"),
+                    radius=[12],
+                    elevation=1
+                )
+                img = FitImage(source=path, radius=[12])
+                img_card.add_widget(img)
+                gallery_box.add_widget(img_card)
+                has_img = True
         
+        if not has_img:
+            gallery_box.add_widget(MDLabel(text="Gambar tidak tersedia", halign="center", size_hint_x=None, width=300))
+
         self.step_manager.transition.direction = "left"
         self.step_manager.current = "detail_screen"
 
-    def save_to_wishlist(self):
+    # [FIX] FUNGSI BARU UNTUK WISHLIST
+    def show_detail_from_wishlist(self, item_data):
+        self.current_detail_laptop = item_data # Load data dari wishlist dict
+        
+        # Panggil fungsi standard show_detail (dia bisa baca dict/series)
+        self.show_detail(item_data)
+        
+        # UPDATE GALLERY KHUSUS (OVERRIDE JIKA PATH BEDA)
+        scr = self.step_manager.get_screen('detail_screen')
+        gallery_box = scr.ids.image_gallery_box
+        gallery_box.clear_widgets()
+        
+        # Load gambar dari path yang tersimpan di wishlist
+        for key in ['img_path_1', 'img_path_2', 'img_path_3', 'img_path_4']:
+            path = item_data.get(key)
+            if path and os.path.exists(path):
+                img_card = MDCard(
+                    size_hint=(None, None),
+                    size=("320dp", "320dp"),
+                    radius=[12],
+                    elevation=1
+                )
+                img = FitImage(source=path, radius=[12])
+                img_card.add_widget(img)
+                gallery_box.add_widget(img_card)
+        
+        # Buka layar detail
+        self.step_manager.current = "detail_screen"
+
+    def add_to_wishlist(self):
         try:
-            from Main.libs.screens.wishlistscreen import wishlist_manager
+            try:
+                from Main.libs.screens.wishlistscreen import wishlist_manager
+            except ImportError:
+                import wishlist_feature
+                wishlist_manager = wishlist_feature.wishlist_manager
             
             if self.current_detail_laptop is not None:
                 item_dict = self.current_detail_laptop.to_dict()
-                success = wishlist_manager.add_item(item_dict)
-                msg = "Berhasil masuk Wishlist!" if success else "Item sudah ada di Wishlist!"
+                
+                brand = str(item_dict.get('Brand', '')).strip()
+                nama = str(item_dict.get('Nama', '')).strip()
+                unique_id = f"{brand}_{nama}".replace(" ", "_").lower()
+                
+                # Copy semua data agar lengkap saat dikembalikan
+                wishlist_data = item_dict.copy()
+                
+                # Tambah field wajib
+                wishlist_data.update({
+                    'id': unique_id,
+                    'name': f"{brand} {nama}",
+                    'price': int(item_dict.get('CleanPrice', 0)),
+                    'price_text': str(item_dict.get('Harga', '')),
+                    'image': self.get_image_path(str(item_dict.get('Image1', ''))),
+                    # Simpan path lengkap semua gambar
+                    'img_path_1': self.get_image_path(str(item_dict.get('Image1', ''))),
+                    'img_path_2': self.get_image_path(str(item_dict.get('Image2', ''))),
+                    'img_path_3': self.get_image_path(str(item_dict.get('Image3', ''))),
+                    'img_path_4': self.get_image_path(str(item_dict.get('Image4', ''))),
+                })
+                
+                success = wishlist_manager.add_item(wishlist_data)
+                msg = "Berhasil masuk Wishlist!" if success else "Sudah ada di Wishlist!"
                 
                 MDSnackbar(
                     MDSnackbarText(text=msg),
                     y=dp(24),
                     pos_hint={"center_x": 0.5},
-                    size_hint_x=0.8
+                    size_hint_x=0.8,
                 ).open()
-        except ImportError:
-            print("Gagal import wishlist_manager. Pastikan file wishlistscreen.py ada.")
         except Exception as e:
-            print(f"Error saving wishlist: {e}")
+            print(f"DEBUG Error Wishlist: {e}")
+            MDSnackbar(
+                MDSnackbarText(text="Gagal akses Wishlist"),
+                y=dp(24),
+                pos_hint={"center_x": 0.5},
+                size_hint_x=0.8,
+            ).open()
+
+    def open_tokped(self):
+        if self.current_detail_laptop is not None:
+            webbrowser.open(str(self.current_detail_laptop.get('Tokped', '')))
+
+    def open_shopee(self):
+        if self.current_detail_laptop is not None:
+            webbrowser.open(str(self.current_detail_laptop.get('Shopee', '')))
 
 if __name__ == "__main__":
-    GadgetRecommenderApp().run()
+    class TestApp(MDApp):
+        def build(self): return GadgetRecommendationScreen()
+    TestApp().run()
