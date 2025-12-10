@@ -23,6 +23,19 @@ class ProfileScreen(MDScreen):
     def back_to_home(self):
         self.manager.current = "home_screen"
 
+    def on_enter(self, *args):
+        app = MDApp.get_running_app()
+        # Default text jika belum login atau property kosong
+        username_text = "Guest"
+        
+        # Cek apakah property username ada dan tidak kosong
+        if hasattr(app, 'username') and app.username:
+            username_text = app.username
+            
+        # Update label di UI
+        if hasattr(self, 'ids') and 'username_label' in self.ids:
+            self.ids.username_label.text = username_text
+
     def open_file_chooser(self):
         """Open a file chooser popup to let user pick an image, then upload it."""
         content = BoxLayout(orientation='vertical')

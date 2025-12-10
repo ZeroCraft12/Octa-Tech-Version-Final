@@ -22,49 +22,63 @@ from kivymd.uix.dialog import (
     MDDialogContentContainer,
 )
 
-# Data Dummy dengan teks PANJANG untuk mengetes Scroll
-INITIAL_PRODUCTS = [
-    {
-        'id': 1,
-        'name': 'iPhone 15 Pro',
-        'image': 'https://placehold.co/600x600/4F46E5/FFFFFF/png?text=iPhone+15+Pro',
-        'category': 'Smartphone',
-        'reviews': [
-            {'id': 1, 'user': 'Budi Santoso', 'rating': 5, 'text': 'Kamera luar biasa! Hasil foto sangat jernih bahkan di malam hari. Saya sudah mencoba memotret bulan dan hasilnya menakjubkan. Baterai juga tahan seharian untuk pemakaian normal.'},
-            {'id': 2, 'user': 'Siti Aminah', 'rating': 4, 'text': 'Performa sangat cepat untuk edit video ringan. Namun harganya memang cukup mahal dibandingkan kompetitor. Tapi build quality titaniumnya terasa sangat premium dan ringan di tangan.'},
-            {'id': 3, 'user': 'Reviewer Panjang', 'rating': 5, 'text': 'Ini adalah tes teks panjang untuk memastikan layar bisa di-scroll. '.join(['Lorem ipsum dolor sit amet. '] * 10)},
-            {'id': 4, 'user': 'Pengguna Lama', 'rating': 3, 'text': 'Upgrade dari iPhone 11, terasa bedanya jauh sekali terutama di layar 120Hz.'}
-        ]
-    },
-    {
-        'id': 2,
-        'name': 'Samsung Galaxy S24',
-        'image': 'https://placehold.co/600x600/7C3AED/FFFFFF/png?text=Galaxy+S24',
-        'category': 'Smartphone',
-        'reviews': [
-            {'id': 1, 'user': 'Andi Wijaya', 'rating': 5, 'text': 'Layar AMOLED-nya sangat tajam.'},
-            {'id': 2, 'user': 'Dewi Lestari', 'rating': 4, 'text': 'Fitur AI sangat membantu.'}
-        ]
-    },
-    {
-        'id': 3,
-        'name': 'MacBook Air M3',
-        'image': 'https://placehold.co/600x600/059669/FFFFFF/png?text=MacBook+Air+M3',
-        'category': 'Laptop',
-        'reviews': [
-            {'id': 1, 'user': 'Rudi Hartono', 'rating': 5, 'text': 'Ringan, cepat, dan baterai tahan lama.'}
-        ]
-    },
-    {
-        'id': 4,
-        'name': 'Sony WH-1000XM5',
-        'image': 'https://placehold.co/600x600/DC2626/FFFFFF/png?text=Sony+XM5',
-        'category': 'Headphone',
-        'reviews': [
-            {'id': 1, 'user': 'Joko Susilo', 'rating': 5, 'text': 'Noise cancellation terbaik!'}
-        ]
-    },
-]
+import csv
+import os
+
+def load_products():
+    products = []
+    # Determine the directory of the current script
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    # Path to CSV file
+    csv_path = os.path.join(current_dir, "database(Laptop).csv")
+    
+    print(f"DEBUG: Attempting to load CSV from {csv_path}")
+    if not os.path.exists(csv_path):
+        print(f"CRITICAL ERROR: CSV file not found at {csv_path}")
+        return []
+
+    try:
+        # Use utf-8-sig to handle potential BOM from Excel
+        with open(csv_path, mode='r', encoding='utf-8-sig') as file:
+            # Using delimiter ';' as seen in the file content
+            reader = csv.DictReader(file, delimiter=';')
+            
+            # Debug: Print fieldnames to verify CSV structure
+            print(f"DEBUG: CSV Fieldnames: {reader.fieldnames}")
+
+            for i, row in enumerate(reader):
+                try:
+                    # Construct absolute path for the image
+                    image_filename = row.get('Image1', '').strip()
+                    image_path = os.path.join(current_dir, "Laptop", image_filename)
+                    if not os.path.exists(image_path):
+                         # print(f"DEBUG: Image not found: {image_path}") # Optional: reduce noise
+                         pass
+
+                    product = {
+                        'id': int(row['No']),
+                        'name': f"{row['Brand']} {row['Nama']}",
+                        'image': image_path,
+                        'category': 'Laptop',
+                        'price': row.get('Harga', ''),
+                        'description': f"CPU: {row.get('CPU','')}, RAM: {row.get('RAM','')}, Storage: {row.get('Storage','')}",
+                        'reviews': [] 
+                    }
+                    products.append(product)
+                except (ValueError, KeyError) as e:
+                     print(f"CRITICAL ERROR: Skipping row {i} due to error: {e}. Row data: {row}")
+                     continue
+            
+            print(f"DEBUG: Successfully loaded {len(products)} products from CSV.")
+                     
+    except Exception as e:
+        print(f"CRITICAL ERROR: Error reading CSV: {e}")
+        return []
+
+    return products
+
+# Load products from CSV
+INITIAL_PRODUCTS = load_products()
 
 KV = '''
 #:import hex kivy.utils.get_color_from_hex
@@ -156,6 +170,8 @@ KV = '''
 
 <ReviewScreen>:
     md_bg_color: hex("#EEF2FF")
+
+
     
     MDBoxLayout:
         orientation: 'vertical'
@@ -229,6 +245,15 @@ KV = '''
                 padding: "20dp"
                 spacing: "24dp"
                 size_hint_y: None
+
+    MDIconButton:
+        icon: "home"
+        pos_hint: {"top": 0.98, "right": 0.98}
+        theme_icon_color: "Custom"
+        icon_color: hex("#4F46E5")
+        on_release:
+            app.root.transition.direction = 'right'
+            app.root.current = 'home_screen'
 
 # ----- SCREEN DETAIL -----
 

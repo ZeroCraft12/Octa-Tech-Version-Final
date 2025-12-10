@@ -301,7 +301,10 @@ class LoginScreen(MDScreen):
 
             if result:
                 nama_user = result[1]
-                MDApp.get_running_app().user_nama = nama_user
+                username_user = result[2]
+                app = MDApp.get_running_app()
+                app.user_nama = nama_user
+                app.username = username_user
                 
                 if self.manager.has_screen("home_screen"):
                     self.manager.current = "home_screen"

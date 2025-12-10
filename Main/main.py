@@ -22,7 +22,7 @@ from Main.libs.screens.tabunganscreen import SavingsScreen
 from Main.libs.screens.rekomendasi_gadget import GadgetRecommendationScreen
 from Main.libs.screens.wishlistscreen import WishlistScreen
 
-from kivy.properties import ListProperty
+from kivy.properties import ListProperty, StringProperty
 import sqlite3
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
@@ -80,7 +80,9 @@ class UnesaSplash2(MDScreen):
 # MAIN APP CLASS
 # =========================================
 class OctaTechApp(MDApp):
+    username = StringProperty("")
     products = ListProperty(INITIAL_PRODUCTS)
+    search_trigger = None
 
     def build(self):
         self.theme_cls.theme_style = "Light"
@@ -149,14 +151,29 @@ class OctaTechApp(MDApp):
             self.filter_products("")
 
     def filter_products(self, query):
-        if not self.root.has_screen('review_screen'): return
+        # Debounce: Cancel previous schedule if user is still typing
+        if self.search_trigger:
+            self.search_trigger.cancel()
+        # Schedule the actual filtering to run after 0.3s
+        self.search_trigger = Clock.schedule_once(lambda dt: self._perform_filter_products(query), 0.3)
+
+    def _perform_filter_products(self, query):
+        print(f"DEBUG: _perform_filter_products called with query='{query}'")
+        if not self.root.has_screen('review_screen'):
+            print("DEBUG: Screen not found")
+            return
         
         grid = self.root.get_screen('review_screen').ids.product_grid
         grid.clear_widgets()
         query = query.lower()
         
+        print(f"DEBUG: Total products: {len(self.products)}")
         for product in self.products:
-            if query in product['name'].lower() or query in product['category'].lower():
+            # Safer access
+            p_name = str(product.get('name', '')).lower()
+            p_cat = str(product.get('category', '')).lower()
+            
+            if query in p_name or query in p_cat:
                 total = sum(r['rating'] for r in product['reviews'])
                 count = len(product['reviews'])
                 avg = round(total / count) if count > 0 else 0
