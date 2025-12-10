@@ -196,5 +196,17 @@ class ProfileScreen(MDScreen):
             self.dialog.dismiss()
             self._show_snackbar(f"Error: {e}")
 
+    def logout(self):
+        app = MDApp.get_running_app()
+        # Reset user session data
+        app.username = ""
+        if hasattr(app, 'user_nama'):
+            app.user_nama = ""
+            
+        # Pindah ke screen login
+        self.manager.transition.direction = "right"
+        self.manager.current = "hero_screen" # Atau "login_screen" tergantung flow, user minta login ulang biasanya ke hero/login. Hero lebih bersih.
+        self._show_snackbar("Berhasil Logout")
+
 
 
