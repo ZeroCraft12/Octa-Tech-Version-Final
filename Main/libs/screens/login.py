@@ -38,241 +38,194 @@ class LoginScreen(MDScreen):
     def build(self):
         self.theme_cls.theme_style = "Light"
         
-        # 1. Layout Utama (Horizontal)
+        # 1. Main Layout (Split Screen)
         main_layout = MDBoxLayout(orientation='horizontal')
         
-        # --- BAGIAN KIRI (GAMBAR & LOGO) ---
-        left_layout = MDFloatLayout(size_hint_x=0.6)
+        # --- LEFT SIDE (BRANDING) ---
+        # 40% Width for Desktop Feel
+        left_layout = MDFloatLayout(
+            size_hint_x=0.45,
+            md_bg_color=(1, 1, 1, 1)
+        )
         
-        # Gambar Background
+        # Background Image with Overlay
         bg_path = os.path.join(IMG_DIR, "login page.jpg")
         if os.path.exists(bg_path):
             bg_image = FitImage(source=bg_path)
-        else:
-            bg_image = MDLabel(text="BG Missing", halign="center")
+            left_layout.add_widget(bg_image)
+            
+            # Dark Blue Overlay
+            overlay = MDCard(
+                size_hint=(1, 1),
+                md_bg_color=(0.1, 0.1, 0.35, 0.85),
+                radius=[0],
+                elevation=0
+            )
+            left_layout.add_widget(overlay)
 
-        # Logo
+        # Branding Content
+        branding_box = MDBoxLayout(
+            orientation='vertical',
+            adaptive_height=True,
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            spacing="16dp",
+            padding="40dp"
+        )
+        
         logo_path = os.path.join(IMG_DIR, "LogoText.png")
         if os.path.exists(logo_path):
             logo = Image(
                 source=logo_path,
-                size=(dp(700), dp(700)),
                 size_hint=(None, None),
-                pos_hint={'center_x': 0.5, 'center_y': 0.5},
+                size=(dp(200), dp(200)),
+                pos_hint={'center_x': 0.5}
             )
-        else:
-            logo = Widget()
-        
-        # Overlay Biru Transparan
-        overlay = MDBoxLayout(md_bg_color=(0, 0.5, 1, 0.1))
-        
+            branding_box.add_widget(logo)
+
         tagline = MDLabel(
-            text="Recommended Gadget for Student",
+            text="Recommended Gadget\nfor Student",
             halign="center",
-            pos_hint={"center_x": .5, "center_y": 0.3},
             font_style="Headline",
             role="medium",
             bold=True,
             theme_text_color="Custom",
-            text_color=(0.1, 0.1, 0.1, 1),
-            # font_name="poppins_bold" # Pastikan font terload di main.py
+            text_color=(1, 1, 1, 1),
+            adaptive_height=True
         )
+        branding_box.add_widget(tagline)
+        
+        sub_tagline = MDLabel(
+            text="Temukan laptop impianmu dengan mudah dan cepat bersama Octa Tech.",
+            halign="center",
+            font_style="Body",
+            role="medium",
+            theme_text_color="Custom",
+            text_color=(0.9, 0.9, 0.9, 1),
+            adaptive_height=True
+        )
+        branding_box.add_widget(sub_tagline)
+        
+        left_layout.add_widget(branding_box)
 
-        left_layout.add_widget(bg_image)
-        left_layout.add_widget(overlay)
-        left_layout.add_widget(tagline)
-        left_layout.add_widget(logo)
 
-        # --- BAGIAN KANAN (FORM LOGIN) ---
+        # --- RIGHT SIDE (FORM) ---
         right_layout = MDFloatLayout(
-            size_hint_x=0.4,
-            md_bg_color=(11/255, 20/255, 54/255, 1) # Warna Navy sesuai desainmu
+            size_hint_x=0.55,
+            md_bg_color=(1, 1, 1, 1) # White clean background
         )
         
-        # Container Form (Vertical)
-        form_box = MDBoxLayout(
+        # Scrollable Form Container (for smaller screens protection)
+        form_container = MDBoxLayout(
             orientation='vertical',
             adaptive_height=True,
             pos_hint={"center_x": .5, "center_y": .5},
-            padding=dp(40),
-            spacing=dp(20)
+            padding="60dp",
+            spacing="24dp",
+            size_hint_x=0.8
         )
         
-        # Judul
-        title_label = MDLabel(
-            text="Login",
+        # 1. Header Text
+        header_box = MDBoxLayout(orientation='vertical', adaptive_height=True, spacing="8dp")
+        welcome_label = MDLabel(
+            text="Welcome Back! 👋",
             font_style="Display",
-            role="medium",
-            bold=True,
-            halign="center",
-            theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            # font_name="LeaguaeSpartan_Bold"
-        )
-        
-        subtitle_label = MDLabel(
-            text="Masukkan username dan password untuk melanjutkan",
-            font_style="Body",
             role="small",
-            halign="center",
+            bold=True,
             theme_text_color="Custom",
-            text_color=(0.7, 0.7, 0.8, 1),
-            size_hint_y=None,
+            text_color=(0.1, 0.17, 0.35, 1), # Navy
             adaptive_height=True
-            # font_name="poppins_bold"
         )
+        subtitle_label = MDLabel(
+            text="Masukkan detail akun kamu untuk login.",
+            font_style="Body",
+            role="large",
+            theme_text_color="Secondary",
+            adaptive_height=True
+        )
+        header_box.add_widget(welcome_label)
+        header_box.add_widget(subtitle_label)
+        form_container.add_widget(header_box)
 
-        # --- INPUT USERNAME (FIX: Rounded & White) ---
-        username_container = MDCard(
-            size_hint=(None, None),
-            size=(dp(350), dp(56)), # Lebar disesuaikan dengan desain Desktop (1920x1080)
-            pos_hint={'center_x': .5},
-            radius=[25, 25, 25, 25],
-            md_bg_color=(1, 1, 1, 1), # Putih Solid
-            elevation=0,
-        )
-        
+        # 2. Inputs
         self.username_field = MDTextField(
+            MDTextFieldHintText(text="Username"),
             mode="outlined",
-            size_hint=(1, 1),
-            pos_hint={'center_x': .5, 'center_y': .5},
-            radius=[25, 25, 25, 25],
-            theme_bg_color="Custom",
-            fill_color_normal=(0, 0, 0, 0),
-            fill_color_focus=(0, 0, 0, 0),
-            line_color_normal=(0, 0, 0, 0), # Hapus border bawaan
-            line_color_focus=(0, 0, 0, 0),
+            size_hint_x=1,
+            theme_text_color="Custom",
+            text_color_normal=(0.2, 0.2, 0.2, 1),
         )
-        
-        username_hint = MDTextFieldHintText(
-            text="Username",
-            text_color_normal=(0.5, 0.5, 0.5, 1),
-            # font_name="roboto_light"
-        )
-        self.username_field.add_widget(username_hint)
-        username_container.add_widget(self.username_field) # Masukkan field ke container
-
-        # --- INPUT PASSWORD (FIX: Rounded & White) ---
-        password_container = MDCard(
-            size_hint=(None, None),
-            size=(dp(350), dp(56)),
-            pos_hint={'center_x': .5},
-            radius=[25, 25, 25, 25],
-            md_bg_color=(1, 1, 1, 1), # Putih Solid
-            elevation=0,
-        )
+        form_container.add_widget(self.username_field)
 
         self.password_field = MDTextField(
+            MDTextFieldHintText(text="Password"),
             mode="outlined",
-            size_hint=(1, 1),
-            pos_hint={'center_x': .5, 'center_y': .5},
-            radius=[25, 25, 25, 25],
-            theme_bg_color="Custom",
-            fill_color_normal=(0, 0, 0, 0),
-            fill_color_focus=(0, 0, 0, 0),
-            line_color_normal=(0, 0, 0, 0),
-            line_color_focus=(0, 0, 0, 0),
+            size_hint_x=1,
             password=True
         )
-        
-        password_hint = MDTextFieldHintText(
-            text="Password",
-            text_color_normal=(0.5, 0.5, 0.5, 1),
-            # font_name="roboto_light"
-        )
-        self.password_field.add_widget(password_hint)
-        password_container.add_widget(self.password_field) # Masukkan field ke container
+        form_container.add_widget(self.password_field)
 
-        # Tombol Sign In
+        # 3. Actions (Forgot Password? etc - Placeholder)
+        
+        # 4. Buttons
+        button_box = MDBoxLayout(orientation='vertical', adaptive_height=True, spacing="16dp")
+        
         btn_signin = MDButton(
             style="filled",
             theme_bg_color="Custom",
-            md_bg_color=(0, 0.47, 0.8, 1),
-            theme_width="Custom",
-            size_hint_x=None,
-            width=dp(350), # Samakan lebar dengan input
-            radius=[dp(10)],
-            pos_hint={"center_x": .5}
+            md_bg_color=(0.31, 0.27, 0.9, 1), # Indigo #4F46E5
+            size_hint_x=1,
+            height="54dp",
+            radius=[12]
         )
         btn_signin.bind(on_release=self.do_login)
-        
-        btn_text = MDButtonText(
+        btn_signin.add_widget(MDButtonText(
             text="Sign In",
-            theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
             pos_hint={"center_x": .5, "center_y": .5},
-            font_style="Title",
-            role="medium",
-            # font_name="monserrat-arabic-semisbold.otf"
-        )
-        btn_signin.add_widget(btn_text)
-
-        # Footer (Link Sign Up)
+            bold=True,
+            theme_text_color="Custom",
+            text_color=(1,1,1,1)
+        ))
+        button_box.add_widget(btn_signin)
+        
+        # 5. Footer (Sign Up Link)
         footer_box = MDBoxLayout(
             orientation='horizontal',
-            adaptive_height=True,
-            spacing=dp(5),
-            pos_hint={'center_x': .5}
-        )
-        footer_label = MDLabel(
-            text="Belum punya akun?",
-            halign="left",
-            theme_text_color="Custom",
-            text_color=(0.7, 0.7, 0.8, 1),
-            font_style="Body",
-            role="small",
-            # font_name="monserrat-arabic-semisbold.otf"
-        )
-        
-        btn_signup = MDButton(style="text")
-        btn_signup_text = MDButtonText(
-            text="Sign Up",
-            theme_text_color="Custom",
-            text_color=(1, 0.8, 0, 1),
-            bold=True,
-            pos_hint={"center_x": .5, "center_y": .5},
-            # font_name="roboto_light"
-        )
-        btn_signup.add_widget(btn_signup_text)
-        btn_signup.bind(on_release=self.go_to_signup)
-        
-        footer_box.add_widget(footer_label)
-        footer_box.add_widget(btn_signup)
-
-        # Tombol Kembali
-        btn_back = MDButton(
-            style="filled",
-            theme_bg_color="Custom",
-            md_bg_color=(0, 0.47, 0.8, 1),
-            theme_width="Custom",
-            size_hint_x=None,
-            width=dp(350),
-            radius=[dp(10)],
+            adaptive_height=True, 
+            spacing="6dp",
             pos_hint={"center_x": .5}
         )
-        btn_text_back = MDButtonText(
-            text="Kembali",
-            theme_text_color="Custom",
-            text_color=(1, 1, 1, 1),
-            pos_hint={"center_x": .5, "center_y": .5},
-            font_style="Title",
-            role="medium",
-            # font_name="monserrat-arabic-semisbold.otf"
-        )
-        btn_back.add_widget(btn_text_back)
-        btn_back.bind(on_release=self.bat_to_firstpage)
-
-        # MENYUSUN FORM (Urutan yang benar agar tidak error)
-        form_box.add_widget(title_label)
-        form_box.add_widget(subtitle_label)
-        form_box.add_widget(username_container) # Masukkan Container (Bukan Field langsung)
-        form_box.add_widget(password_container) # Masukkan Container (Bukan Field langsung)
-        form_box.add_widget(Widget(size_hint_y=None, height=dp(10)))
-        form_box.add_widget(btn_signin)
-        form_box.add_widget(btn_back)
-        form_box.add_widget(footer_box)
+        footer_box.add_widget(MDLabel(
+            text="Belum punya akun?",
+            adaptive_width=True,
+            theme_text_color="Secondary",
+            font_style="Body",
+            role="medium"
+        ))
         
-        right_layout.add_widget(form_box)
+        btn_signup = MDButton(style="text")
+        btn_signup.bind(on_release=self.go_to_signup)
+        btn_signup.add_widget(MDButtonText(
+            text="Daftar Sekarang",
+            theme_text_color="Custom",
+            text_color=(0.31, 0.27, 0.9, 1),
+            bold=True
+        ))
+        footer_box.add_widget(btn_signup)
+        button_box.add_widget(footer_box)
+        
+        form_container.add_widget(button_box)
+
+        # Add form to right layout
+        right_layout.add_widget(form_container)
+
+        # Add navigation back (Corner)
+        btn_back = MDButton(
+            style="text",
+            pos_hint={"top": 0.95, "right": 0.95},
+        )
+        btn_back.bind(on_release=self.bat_to_firstpage)
+        btn_back.add_widget(MDButtonText(text="Kembali", theme_text_color="Secondary"))
+        right_layout.add_widget(btn_back)
 
         main_layout.add_widget(left_layout)
         main_layout.add_widget(right_layout)

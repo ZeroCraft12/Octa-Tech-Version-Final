@@ -107,30 +107,103 @@ class GadgetDataManager:
 KV = '''
 #:import hex kivy.utils.get_color_from_hex
 
+<NavHeader@MDBoxLayout>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: "100dp"
+    md_bg_color: hex("#4F46E5")
+    padding: ["24dp", "24dp", "24dp", "24dp"]
+    spacing: "12dp"
+    radius: [0, 0, 24, 24]
+    
+    MDIconButton:
+        icon: "home"
+        theme_icon_color: "Custom"
+        icon_color: 1, 1, 1, 1
+        pos_hint: {"center_y": .6}
+        on_release: app.root.get_screen("rekomendasi_gadget").go_to_home() 
+        style: "standard"
+
+    MDBoxLayout:
+        orientation: "vertical"
+        adaptive_height: True
+        pos_hint: {"center_y": .6}
+        MDLabel:
+            text: "Panduan Rekomendasi"
+            halign: "center"
+            bold: True
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            font_style: "Title"
+            role: "medium"
+            adaptive_height: True
+        MDLabel:
+            text: "Temukan gadget impianmu sesuai kebutuhan"
+            halign: "center"
+            theme_text_color: "Custom"
+            text_color: hex("#E0E7FF")
+            font_style: "Body"
+            role: "small"
+            adaptive_height: True
+
+    MDIconButton:
+        icon: "refresh"
+        theme_icon_color: "Custom"
+        icon_color: 1, 1, 1, 1
+        pos_hint: {"center_y": .6}
+        on_release: app.root.get_screen("rekomendasi_gadget").restart_flow()
+        style: "standard"
+
+# New Component for Options
+<OptionCard@MDCard>:
+    orientation: "horizontal"
+    size_hint_y: None
+    height: "72dp"
+    radius: [12]
+    padding: "16dp"
+    spacing: "16dp"
+    style: "elevated"
+    md_bg_color: 1, 1, 1, 1
+    elevation: 1
+    ripple_behavior: True
+    
+    MDIcon:
+        icon: root.icon_name if hasattr(root, 'icon_name') else "checkbox-blank-circle-outline"
+        theme_text_color: "Custom"
+        text_color: hex("#4F46E5")
+        pos_hint: {"center_y": .5}
+        
+    MDLabel:
+        text: root.text_option if hasattr(root, 'text_option') else ""
+        font_style: "Title"
+        role: "small"
+        pos_hint: {"center_y": .5}
+
 <GridCardItem>:
     orientation: "horizontal"
     size_hint_y: None
-    height: "130dp"
-    padding: "10dp"
-    spacing: "15dp"
-    radius: [15]
-    elevation: 1
+    height: "140dp"
+    padding: "12dp"
+    spacing: "16dp"
+    radius: [16]
+    elevation: 2
     style: "elevated"
-    theme_bg_color: "Custom"
-    md_bg_color: [1, 1, 1, 1]
+    md_bg_color: 1, 1, 1, 1
     ripple_behavior: True
+    shadow_softness: 2
+    shadow_offset: (0, 2)
     
     FitImage:
         source: root.source
         size_hint: (None, 1)
         width: self.height
-        radius: [10]
+        radius: [12]
         
     MDBoxLayout:
         orientation: "vertical"
         pos_hint: {"center_y": .5}
         adaptive_height: True
-        spacing: "6dp"
+        spacing: "4dp"
         
         MDLabel:
             text: root.product_name
@@ -141,6 +214,8 @@ KV = '''
             max_lines: 2
             shorten: True
             shorten_from: "right"
+            theme_text_color: "Custom"
+            text_color: hex("#111827")
             
         MDLabel:
             text: root.cpu_info
@@ -151,68 +226,28 @@ KV = '''
             shorten: True
             adaptive_height: True
 
-    MDBoxLayout:
-        orientation: "vertical"
-        size_hint_x: None
-        width: "110dp"
-        pos_hint: {"center_y": .5}
-        adaptive_height: True
-        
         MDLabel:
             text: root.price
-            font_style: "Label"
-            role: "large"
+            font_style: "Title"
+            role: "medium"
             theme_text_color: "Custom"
-            text_color: [0.2, 0.7, 0.2, 1]
+            text_color: hex("#16A34A") # Green
             bold: True
-            halign: "right"
             adaptive_height: True
-
-<NavHeader@MDBoxLayout>:
-    orientation: 'horizontal'
-    size_hint_y: None
-    height: "64dp"
-    md_bg_color: [0.1, 0.17, 0.35, 1]
-    padding: [16, 0]
-    spacing: "12dp"
-    
-    MDButton:
-        style: "text"
-        theme_icon_color: "Custom"
-        icon_color: 1, 1, 1, 1
-        pos_hint: {"center_y": .5}
-        on_release: app.root.get_screen("rekomendasi_gadget").go_to_home() 
-        MDButtonIcon:
-            icon: "home"
-    MDLabel:
-        text: "Octa Tech."
-        halign: "center"
-        bold: True
-        theme_text_color: "Custom"
-        text_color: 1, 1, 1, 1
-        font_style: "Title"
-        role: "large"
-        pos_hint: {"center_y": .5}
-    MDButton:
-        style: "text"
-        theme_icon_color: "Custom"
-        icon_color: 1, 1, 1, 1
-        pos_hint: {"center_y": .5}
-        on_release: app.root.get_screen("rekomendasi_gadget").restart_flow()
-        MDButtonIcon:
-            icon: "refresh"
+            padding: [0, "8dp", 0, 0]
 
 <GadgetStepScreen>:
     MDBoxLayout:
         orientation: 'vertical'
-        md_bg_color: [0.98, 0.98, 0.98, 1]
+        md_bg_color: hex("#F9FAFB")
+        
         NavHeader:
+        
         MDBoxLayout:
             orientation: 'vertical'
-            padding: "20dp"
-            spacing: "10dp"
-            MDWidget:
-                size_hint_y: 0.1
+            padding: ["24dp", "32dp", "24dp", "24dp"]
+            spacing: "24dp"
+            
             MDLabel:
                 id: question_label
                 text: "Pertanyaan?"
@@ -221,40 +256,36 @@ KV = '''
                 role: "medium"
                 bold: True
                 adaptive_height: True
-            MDWidget:
-                size_hint_y: 0.05
-            MDBoxLayout:
-                size_hint_y: None
-                height: "400dp"
-                MDScrollView:
-                    bar_width: 0
-                    MDAnchorLayout:
-                        anchor_x: "center"
-                        anchor_y: "top"
-                        size_hint_y: None
-                        height: options_grid.height
-                        MDGridLayout:
-                            id: options_grid
-                            cols: 1
-                            spacing: "15dp"
-                            padding: "10dp"
-                            adaptive_size: True
-            MDWidget:
-                size_hint_y: 0.2
+                theme_text_color: "Custom"
+                text_color: hex("#1F2937")
+
+            MDScrollView:
+                bar_width: 0
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    adaptive_height: True
+                    MDGridLayout:
+                        id: options_grid
+                        cols: 1
+                        spacing: "16dp"
+                        adaptive_height: True
+
             MDAnchorLayout:
                 anchor_x: "right"
                 size_hint_y: None
                 height: "60dp"
                 MDButton:
-                    style: "outlined"
+                    style: "text"
                     on_release: root.controller.next_step(skip=True)
                     MDButtonText:
-                        text: "SKIP >>"
+                        text: "LEWATI >>"
+                        theme_text_color: "Custom"
+                        text_color: hex("#6B7280")
 
 <GadgetResultScreen>:
     MDBoxLayout:
         orientation: 'vertical'
-        md_bg_color: [0.96, 0.96, 0.96, 1]
+        md_bg_color: hex("#F3F4F6")
         NavHeader:
         
         MDBoxLayout:
@@ -262,224 +293,228 @@ KV = '''
             
             MDBoxLayout:
                 adaptive_height: True
-                padding: "16dp"
-                spacing: "10dp"
+                padding: ["24dp", "16dp"]
+                spacing: "12dp"
+                md_bg_color: hex("#FFFFFF")
+                elevation: 0
+                
                 MDLabel:
                     text: "Hasil Rekomendasi"
-                    font_style: "Headline"
-                    role: "small"
+                    font_style: "Title"
+                    role: "large"
                     bold: True
+                    theme_text_color: "Custom"
+                    text_color: hex("#1F2937")
+                    pos_hint: {"center_y": .5}
+                    
+                MDWidget:
+                
+                # Sort Buttons styled as Chips
                 MDButton:
                     style: "tonal"
+                    height: "32dp"
                     on_release: root.controller.apply_sort("price_asc")
+                    radius: [8]
+                    theme_bg_color: "Custom"
+                    md_bg_color: hex("#EEF2FF")
                     MDButtonText:
                         text: "Termurah"
+                        theme_text_color: "Custom"
+                        text_color: hex("#4F46E5")
+                        font_style: "Label"
+                        role: "large"
+                        
                 MDButton:
                     style: "tonal"
+                    height: "32dp"
                     on_release: root.controller.apply_sort("price_desc")
+                    radius: [8]
+                    theme_bg_color: "Custom"
+                    md_bg_color: hex("#EEF2FF")
                     MDButtonText:
                         text: "Termahal"
+                        theme_text_color: "Custom"
+                        text_color: hex("#4F46E5")
+                        font_style: "Label"
+                        role: "large"
 
             MDScrollView:
                 do_scroll_x: False
-                bar_width: 0
+                bar_width: "6dp"
                 MDGridLayout:
                     id: result_grid
                     cols: 1
-                    spacing: "12dp"
-                    padding: "16dp"
+                    spacing: "16dp"
+                    padding: ["24dp", "16dp"]
                     adaptive_height: True
                     size_hint_y: None
-                    height: self.minimum_height
 
             MDAnchorLayout:
                 anchor_x: "center"
                 size_hint_y: None
-                height: "70dp"
+                height: "80dp"
+                padding: "16dp"
                 MDButton:
                     style: "filled"
+                    theme_bg_color: "Custom"
+                    md_bg_color: hex("#111827")
                     on_release: root.controller.restart_flow()
+                    size_hint_x: 1
                     MDButtonText:
                         text: "Cari Ulang"
+                        pos_hint: {"center_x": .5, "center_y": .5}
 
 <GadgetDetailScreen>:
     MDBoxLayout:
         orientation: 'vertical'
-        md_bg_color: [1, 1, 1, 1]
+        md_bg_color: hex("#F9FAFB")
+        
         NavHeader:
         
         MDScrollView:
+            bar_width: "8dp"
             MDBoxLayout:
                 orientation: 'vertical'
                 adaptive_height: True
-                padding: "0dp"
-                spacing: "0dp"
                 
-                # 1. GAMBAR BESAR
+                # 1. HERO IMAGE COMPONENT
                 MDBoxLayout:
                     size_hint_y: None
-                    height: "350dp"
-                    md_bg_color: [0.98, 0.98, 0.98, 1]
-                    padding: [10, 10]
+                    height: "300dp"
+                    md_bg_color: [1, 1, 1, 1]
+                    padding: "24dp"
                     
                     MDScrollView:
                         do_scroll_x: True
                         do_scroll_y: False
                         bar_width: 0
                         
-                        # [FIX] MENGGUNAKAN ID: image_gallery_box (BUKAN CAROUSEL)
                         MDBoxLayout:
                             id: image_gallery_box 
                             orientation: 'horizontal'
                             adaptive_width: True
-                            spacing: "10dp"
+                            spacing: "16dp"
 
-                # 2. JUDUL + WISHLIST
+                # 2. PRODUCT TITLE & ACTION
                 MDBoxLayout:
                     orientation: 'vertical'
                     adaptive_height: True
-                    padding: ["24dp", "10dp"]
-                    spacing: "5dp"
+                    padding: ["24dp", "24dp", "24dp", "8dp"]
+                    spacing: "8dp"
+                    md_bg_color: hex("#FFFFFF")
+                    radius: [0, 0, 24, 24]
+                    elevation: 1
                     
-                    MDLabel:
-                        id: detail_name
-                        text: "Nama Laptop"
-                        font_style: "Headline"
-                        role: "medium"
-                        bold: True
-                        halign: "center"
-                        adaptive_height: True
-                    
-                    MDIconButton:
-                        icon: "heart-outline"
-                        style: "standard"
-                        pos_hint: {"center_x": .5}
-                        theme_icon_color: "Custom"
-                        icon_color: [1, 0, 0, 1]
-                        on_release: root.controller.add_to_wishlist()
-
-                MDWidget:
-                    size_hint_y: None
-                    height: "10dp"
-
-                # 3. SPLIT CONTAINER
-                MDBoxLayout:
-                    orientation: 'horizontal'
-                    adaptive_height: True
-                    padding: ["20dp", "0dp"]
-                    spacing: "20dp"
-                    
-                    # --- KIRI: SPESIFIKASI ---
                     MDBoxLayout:
-                        orientation: 'vertical'
                         adaptive_height: True
-                        size_hint_x: 0.55
-                        pos_hint: {"top": 1}
-                        
+                        spacing: "12dp"
                         MDLabel:
-                            text: "Spesifikasi:"
-                            font_style: "Title" 
-                            role: "large"
+                            id: detail_name
+                            text: "Nama Laptop"
+                            font_style: "Headline"
+                            role: "medium"
                             bold: True
                             adaptive_height: True
-                            valign: "top"
-                            
-                        MDLabel:
-                            id: detail_specs
-                            text: "..."
-                            font_style: "Body"
-                            role: "medium"
-                            theme_text_color: "Secondary"
-                            adaptive_height: True
-                            valign: "top"
-                            
-                    # --- KANAN: HARGA & TOMBOL ---
-                    MDBoxLayout:
-                        orientation: 'vertical'
+                            theme_text_color: "Custom"
+                            text_color: hex("#111827")
+                        
+                        MDIconButton:
+                            icon: "heart"
+                            style: "tonal"
+                            theme_bg_color: "Custom"
+                            md_bg_color: hex("#FEF2F2")
+                            theme_icon_color: "Custom"
+                            icon_color: hex("#EF4444")
+                            on_release: root.controller.add_to_wishlist()
+                            pos_hint: {"top": 1}
+
+                    MDLabel:
+                        id: detail_price
+                        text: "Rp 0"
+                        font_style: "Headline"
+                        role: "small"
+                        theme_text_color: "Custom"
+                        text_color: hex("#16A34A")
+                        bold: True
                         adaptive_height: True
-                        size_hint_x: 0.45
-                        spacing: "12dp"
-                        pos_hint: {"top": 1}
+
+                # 3. SPECS & LINKS
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    adaptive_height: True
+                    padding: "24dp"
+                    spacing: "24dp"
+                    
+                    # Specs Card
+                    MDCard:
+                        style: "outlined"
+                        padding: "20dp"
+                        radius: [16]
+                        md_bg_color: 1, 1, 1, 1
+                        adaptive_height: True
                         
                         MDBoxLayout:
                             orientation: 'vertical'
                             adaptive_height: True
-                            spacing: "4dp"
+                            spacing: "12dp"
+                            
                             MDLabel:
-                                text: "Estimasi Harga:"
+                                text: "Spesifikasi Utama"
                                 font_style: "Title" 
-                                role: "large"
+                                role: "medium"
                                 bold: True
-                                halign: "center"
                                 adaptive_height: True
+                                
+                            MDDivider:
+                                
                             MDLabel:
-                                id: detail_price
-                                text: "Rp 0"
-                                font_style: "Headline"
-                                role: "small"
-                                halign: "center"
-                                theme_text_color: "Custom"
-                                text_color: [0.2, 0.7, 0.2, 1]
-                                bold: True
+                                id: detail_specs
+                                text: "..."
+                                font_style: "Body"
+                                role: "large"
+                                theme_text_color: "Secondary"
                                 adaptive_height: True
+                                line_height: 1.5
+
+                    # Action Buttons
+                    MDBoxLayout:
+                        adaptive_height: True
+                        spacing: "12dp"
                         
                         MDButton:
                             style: "filled"
                             theme_bg_color: "Custom"
-                            md_bg_color: [0.26, 0.63, 0.28, 1]
-                            size_hint_x: None
-                            width: "130dp"
-                            height: "54dp"
-                            pos_hint: {"center_x": .5}
+                            md_bg_color: hex("#42B549") # Tokopedia Green
+                            size_hint_x: 0.5
+                            height: "56dp"
                             on_release: root.controller.open_tokped()
                             MDButtonText:
                                 text: "Tokopedia"
-                                font_style: "Title"
-                                role: "medium"
-                                theme_text_color: "Custom"
-                                text_color: [1,1,1,1]
                                 pos_hint: {"center_x": .5, "center_y": .5}
 
                         MDButton:
                             style: "filled"
                             theme_bg_color: "Custom"
-                            md_bg_color: [0.93, 0.33, 0.18, 1]
-                            size_hint_x: None
-                            width: "130dp"
-                            height: "54dp"
-                            pos_hint: {"center_x": .5}
+                            md_bg_color: hex("#EE4D2D") # Shopee Orange
+                            size_hint_x: 0.5
+                            height: "56dp"
                             on_release: root.controller.open_shopee()
                             MDButtonText:
                                 text: "Shopee"
-                                font_style: "Title"
-                                role: "medium"
-                                theme_text_color: "Custom"
-                                text_color: [1,1,1,1]
                                 pos_hint: {"center_x": .5, "center_y": .5}
-
-                MDWidget:
-                    size_hint_y: None
-                    height: "40dp"
-
-                # 4. TOMBOL KEMBALI
-                MDBoxLayout:
-                    adaptive_height: True
-                    padding: "20dp"
                     
                     MDButton:
-                        style: "filled"
-                        theme_bg_color: "Custom"
-                        md_bg_color: [0.1, 0.4, 0.9, 1]
+                        style: "text"
                         pos_hint: {"center_x": .5}
                         on_release: root.controller.go_back_to_results()
+                        MDButtonIcon:
+                            icon: "arrow-left"
+                            theme_icon_color: "Custom"
+                            icon_color: hex("#4F46E5")
                         MDButtonText:
-                            text: "Kembali"
+                            text: "Kembali ke Hasil"
                             theme_text_color: "Custom"
-                            text_color: [1,1,1,1]
-                            
-                MDWidget:
-                    size_hint_y: None
-                    height: "20dp"
+                            text_color: hex("#4F46E5")
 '''
 
 Builder.load_string(KV)
@@ -487,6 +522,10 @@ Builder.load_string(KV)
 # ==========================================
 # 3. CONTROLLER & UI LOGIC
 # ==========================================
+
+class OptionCard(MDCard):
+    text_option = StringProperty("")
+    icon_name = StringProperty("checkbox-blank-circle-outline")
 
 class GridCardItem(MDCard):
     source = StringProperty("")
@@ -576,10 +615,17 @@ class GadgetRecommendationScreen(MDScreen):
     def _create_option_button(self, text, val, key, screen, is_grid=False):
         grid = screen.ids.options_grid
         grid.cols = 2 if is_grid else 1
-        btn = MDButton(style="outlined", size_hint_x=1)
-        btn.add_widget(MDButtonText(text=text, pos_hint={"center_x":.5, "center_y":.5}))
-        btn.bind(on_release=lambda x: self.save_choice_and_next(key, val))
-        grid.add_widget(btn)
+        
+        # Icon selection based on key
+        icon = "checkbox-blank-circle-outline"
+        if key == "budget": icon = "cash"
+        elif key == "cpu": icon = "chip"
+        elif key == "ram": icon = "memory"
+        elif key == "storage": icon = "harddisk"
+
+        card = OptionCard(text_option=text, icon_name=icon)
+        card.bind(on_release=lambda x: self.save_choice_and_next(key, val))
+        grid.add_widget(card)
 
     def setup_budget_ui(self, scr):
         scr.ids.question_label.text = "Budget Maksimal?"

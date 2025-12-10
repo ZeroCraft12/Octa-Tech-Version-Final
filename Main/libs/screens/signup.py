@@ -1,22 +1,28 @@
 import os
 
 # Nama file database, pastikan sesuai dengan file yang digunakan aplikasi Anda
-DB_NAME = "user_data.db"
+current_file_path_db = os.path.abspath(__file__)
+MAIN_DIR_DB = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path_db)))
+DB_NAME = os.path.join(MAIN_DIR_DB, "user_data.db")
 
 # Inisialisasi database: buat tabel jika belum ada
 def init_db():
     import sqlite3
-    with sqlite3.connect(DB_NAME) as conn:
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS user_data (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nama TEXT,
-                username TEXT UNIQUE,
-                password TEXT
-            )
-        """)
-        conn.commit()
+    try:
+        with sqlite3.connect(DB_NAME) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS user_data (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    nama TEXT,
+                    username TEXT UNIQUE,
+                    password TEXT
+                )
+            """)
+            conn.commit()
+    except Exception as e:
+        print(f"DB Init Error: {e}")
+
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard
@@ -55,168 +61,195 @@ class SignupPage(MDScreen):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Di dalam Screen, kita gunakan __init__, bukan build.
-
-        # 1. Background Image
-        # Saya pakai try-except agar kalau gambar tidak ada, app tidak crash (tetap jalan dengan background warna)
         
-        bg_image = FitImage(
-                # Gunakan r"..." (raw string) untuk path Windows agar backslash aman
-            source=r"C:\Users\lenovo\OneDrive\Dokumen\Desktop\Project-Pemdas-Octatech-test\Main\assets\Images\sign up page.jpg",
-            radius=[0, 0, 0, 0]
+        # 1. Main Layout
+        main_layout = MDBoxLayout(orientation='horizontal')
+        
+        # --- LEFT SIDE (BRANDING) ---
+        # Reuse text/images or change slightly for variety
+        # Path Correction
+        current_file_path = os.path.abspath(__file__)
+        MAIN_DIR = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
+        IMG_DIR = os.path.join(MAIN_DIR, "assets", "Images")
+
+        left_layout = FloatLayout(
+            size_hint_x=0.45
+        )
+        
+        # Reuse login BG for consistency
+        bg_path = os.path.join(IMG_DIR, "login page.jpg") 
+        if os.path.exists(bg_path):
+            bg_image = FitImage(source=bg_path)
+            left_layout.add_widget(bg_image)
+            
+            overlay = MDCard(
+                size_hint=(1, 1),
+                md_bg_color=(0.1, 0.1, 0.35, 0.85),
+                radius=[0],
+                elevation=0
             )
-        self.add_widget(bg_image) # Gunakan self, bukan screen
+            left_layout.add_widget(overlay)
+
+        branding_box = MDBoxLayout(
+            orientation='vertical',
+            adaptive_height=True,
+            pos_hint={'center_x': 0.5, 'center_y': 0.5},
+            spacing="16dp",
+            padding="40dp"
+        )
         
-            # Fallback warna jika gambar gagal load
-        self.md_bg_color = (0.1, 0.1, 0.1, 1)
-
-        layout_utama = FloatLayout()
-
-        # 2. Membuat Card
-        card = MDCard(
-            style="elevated",
-            size_hint=(None, None),
-            size=("300dp", "550dp"), # Tinggi sedikit ditambah agar muat
-            pos_hint={"center_x": 0.5, "center_y": 0.5},
-            theme_bg_color="Custom",
-            md_bg_color="#106EBE",
-            padding="20dp",
-            radius=[30],
-        )
-
-        # 3. Konten dalam Card
-        card_content = MDBoxLayout(
-            orientation="vertical",
-            spacing="15dp",
-            pos_hint={"center_x": 0.5, "center_y": 0.5},
-            adaptive_height=True
-        )
-
-        # --- WIDGETS ---
-
-        # Judul
-        label_title = MDLabel(
-            text="Sign Up",
+        tagline = MDLabel(
+            text="Join Octa Tech\nCommunity",
             halign="center",
             font_style="Headline",
             role="medium",
+            bold=True,
             theme_text_color="Custom",
             text_color=(1, 1, 1, 1),
-            bold=True,
-            adaptive_height=True,
-            font_name="LeaguaeSpartan_Bold"
+            adaptive_height=True
         )
-
-        label_subtitle = MDLabel(
-            text="Buat akunmu untuk mulai menjelajahi\nOctaTech",
+        branding_box.add_widget(tagline)
+        
+        sub_tagline = MDLabel(
+            text="Dapatkan rekomendasi gadget terbaik dan diskusikan dengan pengguna lain.",
             halign="center",
             font_style="Body",
-            role="small",
+            role="medium",
             theme_text_color="Custom",
-            text_color=(0.8, 0.8, 0.8, 1),
+            text_color=(0.9, 0.9, 0.9, 1),
+            adaptive_height=True
+        )
+        branding_box.add_widget(sub_tagline)
+        left_layout.add_widget(branding_box)
+
+
+        # --- RIGHT SIDE (FORM) ---
+        right_layout = FloatLayout(
+            size_hint_x=0.55,
+        )
+        # White BG
+        right_layout.canvas.before.clear()
+        with right_layout.canvas.before:
+            from kivy.graphics import Color, Rectangle
+            Color(1, 1, 1, 1)
+            Rectangle(pos=right_layout.pos, size=right_layout.size)
+            # Bind size/pos update if needed, but simple add_widget bg_color works better usually.
+        # Alternative: just use MDFloatLayout with md_bg_color if imported
+        
+        form_container = MDBoxLayout(
+            orientation='vertical',
             adaptive_height=True,
-            font_name="poppins_bold"
+            pos_hint={"center_x": .5, "center_y": .5},
+            padding="60dp",
+            spacing="20dp",
+            size_hint_x=0.8
         )
 
-        # Input Nama
+        # Header
+        header_box = MDBoxLayout(orientation='vertical', adaptive_height=True, spacing="8dp")
+        title_label = MDLabel(
+            text="Create Account",
+            font_style="Display",
+            role="small",
+            bold=True,
+            theme_text_color="Custom",
+            text_color=(0.1, 0.17, 0.35, 1),
+            adaptive_height=True
+        )
+        subtitle_label = MDLabel(
+            text="Lengkapi data diri untuk mendaftar.",
+            font_style="Body",
+            role="large",
+            theme_text_color="Secondary",
+            adaptive_height=True
+        )
+        header_box.add_widget(title_label)
+        header_box.add_widget(subtitle_label)
+        form_container.add_widget(header_box)
+
+        # Inputs
         self.input_nama = MDTextField(
-            MDTextFieldHintText(text="Nama"),
-            MDTextFieldTrailingIcon(icon="account"),
-            mode="filled",
-            theme_bg_color="Custom",
-            fill_color_normal=(1, 1, 1, 1),
-            fill_color_focus=(1, 1, 1, 1),
-            radius=[10, 10, 10, 10],
-            font_name="roboto_light"
+            MDTextFieldHintText(text="Nama Lengkap"),
+            mode="outlined",
+            size_hint_x=1,
+            theme_text_color="Custom",
+            text_color_normal=(0.2, 0.2, 0.2, 1),
         )
+        form_container.add_widget(self.input_nama)
 
-        # Input Username
         self.input_username = MDTextField(
             MDTextFieldHintText(text="Username"),
-            MDTextFieldTrailingIcon(icon="at"),
-            mode="filled",
-            theme_bg_color="Custom",
-            fill_color_normal=(1, 1, 1, 1),
-            fill_color_focus=(1, 1, 1, 1),
-            radius=[10, 10, 10, 10],
-            font_name="roboto_light"
-            
+            mode="outlined",
+            size_hint_x=1,
+            theme_text_color="Custom",
+            text_color_normal=(0.2, 0.2, 0.2, 1),
         )
+        form_container.add_widget(self.input_username)
 
-        # Input Password
         self.input_password = MDTextField(
             MDTextFieldHintText(text="Password"),
-            MDTextFieldTrailingIcon(icon="key"),
-            mode="filled",
-            theme_bg_color="Custom",
-            fill_color_normal=(1, 1, 1, 1),
-            fill_color_focus=(1, 1, 1, 1),
-            radius=[10, 10, 10, 10],
-            password=False,
-            font_name="roboto_light"
-            
-        )    
-
-        # Tombol Buat Akun
-        btn_signup = MDButton(
-            MDButtonText(
-                text="Buat Akun",
-                theme_text_color="Custom",
-                text_color=(1, 1, 1, 1),
-                pos_hint={"center_x": 0.5, "center_y": 0.5},
-                font_name="monserrat-arabic-semisbold.otf"
-            ),
-            style="filled",
-            pos_hint={"center_x": 0.5},
-            height="40dp",
+            mode="outlined",
             size_hint_x=1,
-            
+            password=True,
+            theme_text_color="Custom",
+            text_color_normal=(0.2, 0.2, 0.2, 1),
         )
+        form_container.add_widget(self.input_password)
 
-        # --- MENYUSUN LAYOUT ---
-        card_content.add_widget(label_title)
-        card_content.add_widget(label_subtitle)
-        card_content.add_widget(MDLabel(text="", size_hint_y=None, height="10dp")) # Spacer
+        # Buttons
+        button_box = MDBoxLayout(orientation='vertical', adaptive_height=True, spacing="16dp")
         
-        card_content.add_widget(self.input_nama)
-        card_content.add_widget(self.input_username)
-        card_content.add_widget(self.input_password)
-        
-        card_content.add_widget(MDLabel(text="", size_hint_y=None, height="20dp")) # Spacer
-        card_content.add_widget(btn_signup)
+        btn_signup = MDButton(
+            style="filled",
+            theme_bg_color="Custom",
+            md_bg_color=(0.31, 0.27, 0.9, 1),
+            size_hint_x=1,
+            height="54dp",
+            radius=[12]
+        )
         btn_signup.bind(on_release=self.do_signup)
-
-
-
-        # Tombol Kembali
-        btn_back = MDButton(
-            style="text",
-            pos_hint={"center_x": 0.5},
-            size_hint=(None, None),
-            height=dp(45),          # tambahin tinggi
-            width=dp(200),          # lebar tombol
-           # padding=(dp(10), dp(10)),
-        )
-
-        btn_back.add_widget(
-             MDButtonText(
-                text="Kembali ke Login",
-                theme_text_color="Custom",
-                text_color=(1, 1, 1, 0.9),
-                font_size="18sp",      # gedein teks
-                font_name="poppins_bold",
-                pos_hint={"center_x": 0.5, "center_y": 0.5},
-            )
-        )
-
-        btn_back.bind(on_release=self.back_to_login)
-        card_content.add_widget(btn_back)
-
-        card.add_widget(card_content)
-        layout_utama.add_widget(card)
+        btn_signup.add_widget(MDButtonText(
+            text="Sign Up",
+            pos_hint={"center_x": .5, "center_y": .5},
+            bold=True,
+            theme_text_color="Custom",
+            text_color=(1,1,1,1)
+        ))
+        button_box.add_widget(btn_signup)
         
-        # Masukkan layout utama ke dalam screen (self)
-        self.add_widget(layout_utama)
+        # Footer
+        footer_box = MDBoxLayout(
+            orientation='horizontal',
+            adaptive_height=True, 
+            spacing="6dp",
+            pos_hint={"center_x": .5}
+        )
+        footer_box.add_widget(MDLabel(
+            text="Sudah punya akun?",
+            adaptive_width=True,
+            theme_text_color="Secondary",
+            font_style="Body",
+            role="medium"
+        ))
+        
+        btn_login = MDButton(style="text")
+        btn_login.bind(on_release=self.back_to_login)
+        btn_login.add_widget(MDButtonText(
+            text="Login di sini",
+            theme_text_color="Custom",
+            text_color=(0.31, 0.27, 0.9, 1),
+            bold=True
+        ))
+        footer_box.add_widget(btn_login)
+        button_box.add_widget(footer_box)
+
+        form_container.add_widget(button_box)
+        right_layout.add_widget(form_container)
+
+        main_layout.add_widget(left_layout)
+        main_layout.add_widget(right_layout)
+        
+        self.add_widget(main_layout)
     
 
     def do_signup(self, instance):

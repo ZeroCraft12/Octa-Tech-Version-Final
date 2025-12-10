@@ -141,7 +141,7 @@ KV = '''
 <StarIcon@MDIcon>:
     theme_text_color: "Custom"
     text_color: hex("#FACC15")
-    font_size: "18sp"
+    font_size: "16sp"
 
 <StarRating@MDBoxLayout>:
     orientation: 'horizontal'
@@ -150,19 +150,19 @@ KV = '''
     rating: 0
     StarIcon:
         icon: "star" if root.rating >= 1 else "star-outline"
-        text_color: hex("#FACC15") if root.rating >= 1 else hex("#E5E7EB")
+        text_color: hex("#FACC15") if root.rating >= 1 else hex("#D1D5DB")
     StarIcon:
         icon: "star" if root.rating >= 2 else "star-outline"
-        text_color: hex("#FACC15") if root.rating >= 2 else hex("#E5E7EB")
+        text_color: hex("#FACC15") if root.rating >= 2 else hex("#D1D5DB")
     StarIcon:
         icon: "star" if root.rating >= 3 else "star-outline"
-        text_color: hex("#FACC15") if root.rating >= 3 else hex("#E5E7EB")
+        text_color: hex("#FACC15") if root.rating >= 3 else hex("#D1D5DB")
     StarIcon:
         icon: "star" if root.rating >= 4 else "star-outline"
-        text_color: hex("#FACC15") if root.rating >= 4 else hex("#E5E7EB")
+        text_color: hex("#FACC15") if root.rating >= 4 else hex("#D1D5DB")
     StarIcon:
         icon: "star" if root.rating >= 5 else "star-outline"
-        text_color: hex("#FACC15") if root.rating >= 5 else hex("#E5E7EB")
+        text_color: hex("#FACC15") if root.rating >= 5 else hex("#D1D5DB")
 
 # ----- SCREEN HOME -----
 
@@ -170,31 +170,33 @@ KV = '''
     style: "elevated"
     orientation: "vertical"
     size_hint_y: None
-    height: "320dp"
-    radius: [12,]
+    height: "340dp"
+    radius: [16,]
     md_bg_color: 1, 1, 1, 1
     on_release: app.show_product_detail(root.product_id)
-    elevation: 1
+    elevation: 2
+    shadow_softness: 4
+    shadow_offset: (0, 2)
     
     MDBoxLayout:
         size_hint_y: None
         height: "180dp"
-        radius: [12, 12, 0, 0]
+        radius: [16, 16, 0, 0]
         FitImage:
             source: root.image_source
-            radius: [12, 12, 0, 0]
+            radius: [16, 16, 0, 0]
             
     MDBoxLayout:
         orientation: "vertical"
         padding: "16dp"
-        spacing: "6dp"
+        spacing: "4dp"
         
         MDLabel:
-            text: root.category
+            text: root.category.upper()
             font_style: "Label"
-            role: "medium"
+            role: "small"
             theme_text_color: "Custom"
-            text_color: hex("#4F46E5")
+            text_color: hex("#6366F1")
             bold: True
             adaptive_height: True
 
@@ -203,107 +205,122 @@ KV = '''
             font_style: "Title"
             role: "medium"
             theme_text_color: "Custom"
-            text_color: hex("#1F2937")
+            text_color: hex("#111827")
             bold: True
             adaptive_height: True
             shorten: True
             shorten_from: 'right'
+            max_lines: 2
+        
+        MDWidget: # Spacer flexible
         
         MDBoxLayout:
             adaptive_height: True
-            spacing: "8dp"
+            spacing: "6dp"
             StarRating:
                 rating: root.rating
             MDLabel:
-                text: f"({root.review_count} reviews)"
+                text: f"({root.review_count})"
                 font_style: "Body"
                 role: "small"
-                theme_text_color: "Secondary"
+                theme_text_color: "Hint"
                 adaptive_height: True
+                pos_hint: {"center_y": .5}
 
 <ReviewScreen>:
-    md_bg_color: hex("#EEF2FF")
+    md_bg_color: hex("#F3F4F6")
 
-
-    
     MDBoxLayout:
         orientation: 'vertical'
         
+        # --- HEADER AREA ---
         MDBoxLayout:
             orientation: 'vertical'
             adaptive_height: True
-            padding: ["20dp", "40dp", "20dp", "30dp"]
+            md_bg_color: hex("#4F46E5")
+            padding: ["24dp", "40dp", "24dp", "50dp"]
             spacing: "8dp"
-            md_bg_color: hex("#EEF2FF")
+            radius: [0, 0, 24, 24]
 
             MDLabel:
                 text: "Review Gadget"
                 halign: "center"
                 font_style: "Headline"
-                role: "medium"
+                role: "large"
                 theme_text_color: "Custom"
-                text_color: hex("#1F2937")
+                text_color: 1, 1, 1, 1
                 bold: True
                 adaptive_height: True
             
             MDLabel:
-                text: "Temukan review produk gadget terbaik dari pengguna"
+                text: "Temukan ulasan jujur dari komunitas kami"
                 halign: "center"
                 font_style: "Body"
                 role: "large"
-                theme_text_color: "Secondary"
+                theme_text_color: "Custom"
+                text_color: hex("#E0E7FF")
                 adaptive_height: True
 
+        # --- SEARCH BAR (Floating) ---
         MDBoxLayout:
             adaptive_height: True
-            padding: [0, 0, 0, "30dp"]
-            MDAnchorLayout:
-                anchor_x: "center"
+            padding: ["24dp", 0, "24dp", 0]
+            # Negative margin to pull it up into header (Note: Kivy layouts can be tricky with negative margins, 
+            # so we use a relative layout approach or just place it right below)
+            # Simplified approach: Just standard placement below header for stability
+            
+            MDCard:
                 size_hint_y: None
                 height: "56dp"
-                MDCard:
-                    size_hint: None, None
-                    size: min(root.width - 40, 600), "56dp"
-                    style: "elevated"
-                    md_bg_color: 1, 1, 1, 1
-                    radius: [8,]
-                    padding: ["16dp", "4dp", "16dp", "4dp"]
-                    MDBoxLayout:
-                        spacing: "12dp"
-                        MDIcon:
-                            icon: "magnify"
-                            pos_hint: {"center_y": .5}
-                            theme_text_color: "Secondary"
-                        TextInput:
-                            id: search_input
-                            hint_text: "Cari produk gadget..."
-                            background_color: 0,0,0,0
-                            foreground_color: 0,0,0,1
-                            cursor_color: 0,0,0,1
-                            font_size: "16sp"
-                            multiline: False
-                            padding_y: [16, 0]
-                            size_hint_y: 1
-                            on_text: app.filter_products(self.text)
+                style: "elevated"
+                md_bg_color: 1, 1, 1, 1
+                radius: [28,]
+                elevation: 3
+                padding: ["16dp", "4dp", "16dp", "4dp"]
+                pos_hint: {"center_x": .5, "top": 1} 
+                # Hacky: Move it up visually using translation if needed, but simple stack is safer
+                
+                MDBoxLayout:
+                    spacing: "12dp"
+                    MDIcon:
+                        icon: "magnify"
+                        pos_hint: {"center_y": .5}
+                        theme_text_color: "Hint"
+                    TextInput:
+                        id: search_input
+                        hint_text: "Cari laptop, hp, dll..."
+                        background_color: 0,0,0,0
+                        foreground_color: 0,0,0,1
+                        cursor_color: hex("#4F46E5")
+                        font_size: "16sp"
+                        multiline: False
+                        padding_y: [16, 0]
+                        size_hint_y: 1
+                        on_text: app.filter_products(self.text)
 
+        # --- CONTENT ---
         MDScrollView:
             do_scroll_x: False
             scroll_type: ['bars', 'content'] 
-            bar_width: "10dp"
+            bar_width: "8dp"
             
             MDGridLayout:
                 id: product_grid
                 cols: 1 if root.width < 600 else (2 if root.width < 900 else 3)
                 adaptive_height: True
-                padding: "20dp"
-                spacing: "24dp"
+                padding: ["24dp", "24dp", "24dp", "24dp"]
+                spacing: "20dp"
                 size_hint_y: None
 
+    # Home Button (Floating Bottom Right or Top Right)
     MDIconButton:
         icon: "home"
-        pos_hint: {"top": 0.98, "right": 0.98}
+        style: "tonal"
+        pos_hint: {"top": 0.96, "right": 0.96}
+        theme_bg_color: "Custom"
+        md_bg_color: 1, 1, 1, 0.2
         theme_icon_color: "Custom"
-        icon_color: hex("#4F46E5")
+        icon_color: 1, 1, 1, 1
         on_release:
             app.root.transition.direction = 'right'
             app.root.current = 'home_screen'
@@ -311,128 +328,101 @@ KV = '''
 # ----- SCREEN DETAIL -----
 
 <DetailScreen>:
-    md_bg_color: hex("#EEF2FF")
+    md_bg_color: hex("#F9FAFB")
     
-    # PERBAIKAN SCROLLVIEW
     MDScrollView:
         do_scroll_x: False
         do_scroll_y: True
-        # PENTING: scroll_type ini memungkinkan drag mouse/touch
         scroll_type: ['bars', 'content'] 
         bar_width: "12dp"
         bar_color: hex("#4F46E5")
-        bar_inactive_color: hex("#C7D2FE")
         
         MDBoxLayout:
             orientation: "vertical"
             adaptive_height: True
-            padding: "20dp"
-            spacing: "20dp"
             
-            MDButton:
-                style: "text"
-                on_release: app.go_back()
-                pos_hint: {"x": 0}
-                MDButtonIcon:
-                    icon: "arrow-left"
-                    theme_text_color: "Custom"
-                    text_color: hex("#4F46E5")
-                MDButtonText:
-                    text: "Kembali ke Pencarian"
-                    theme_text_color: "Custom"
-                    text_color: hex("#4F46E5")
-                    font_style: "Label"
-                    role: "large"
-                    bold: True
-
-            MDCard:
-                orientation: "vertical"
-                size_hint_x: None
-                width: min(root.width - 40, 900)
-                pos_hint: {"center_x": .5}
-                adaptive_height: True
-                radius: [16,]
-                padding: "32dp"
-                md_bg_color: 1, 1, 1, 1
-                elevation: 1
+            # --- HEADER GAMBAR PRODUK ---
+            MDBoxLayout:
+                size_hint_y: None
+                height: "300dp"
+                md_bg_color: 1,1,1,1
                 
-                MDBoxLayout:
-                    orientation: "vertical" if root.width < 700 else "horizontal"
-                    adaptive_height: True
-                    spacing: "32dp"
+                FitImage:
+                    source: root.product_image
+                    size_hint: 1, 1
                     
-                    MDCard:
-                        size_hint: None, None
-                        width: (root.width - 104) if root.width < 700 else "300dp"
-                        height: self.width
-                        radius: [12,]
-                        elevation: 0
-                        md_bg_color: hex("#F3F4F6")
-                        FitImage:
-                            source: root.product_image
-                            radius: [12,]
-                            
-                    MDBoxLayout:
-                        orientation: "vertical"
-                        adaptive_height: True
-                        pos_hint: {"top": 1} if root.width < 700 else {"center_y": .5}
-                        spacing: "8dp"
-                        
-                        MDLabel:
-                            text: root.product_category
-                            theme_text_color: "Custom"
-                            text_color: hex("#4F46E5")
-                            font_style: "Label"
-                            role: "large"
-                            bold: True
-                            adaptive_height: True
-                            
-                        MDLabel:
-                            text: root.product_name
-                            theme_text_color: "Custom"
-                            text_color: hex("#111827")
-                            font_style: "Display"
-                            role: "small"
-                            bold: True
-                            adaptive_height: True
-                            
-                        MDBoxLayout:
-                            adaptive_height: True
-                            spacing: "8dp"
-                            StarRating:
-                                rating: root.product_rating
-                            MDLabel:
-                                text: f"({root.review_count} reviews)"
-                                theme_text_color: "Secondary"
-                                adaptive_height: True
-
-                MDDivider:
-                    color: hex("#E5E7EB")
-                    pos_hint: {"center_x": .5}
-                    modifier: "middle"
-                    
+            # --- KONTEN DETAIL ---
+            MDBoxLayout:
+                orientation: "vertical"
+                adaptive_height: True
+                padding: "24dp"
+                spacing: "24dp"
+                
+                # Info Produk
                 MDBoxLayout:
+                    orientation: "vertical"
                     adaptive_height: True
-                    padding: [0, "24dp", 0, "16dp"]
+                    spacing: "8dp"
+                    
                     MDLabel:
-                        text: "Review Pengguna"
+                        text: root.product_category.upper()
+                        theme_text_color: "Custom"
+                        text_color: hex("#4F46E5")
+                        font_style: "Label"
+                        role: "medium"
+                        bold: True
+                        adaptive_height: True
+                        
+                    MDLabel:
+                        text: root.product_name
+                        theme_text_color: "Custom"
+                        text_color: hex("#111827")
                         font_style: "Headline"
                         role: "small"
                         bold: True
                         adaptive_height: True
+                        
+                    MDBoxLayout:
+                        adaptive_height: True
+                        spacing: "8dp"
+                        StarRating:
+                            rating: root.product_rating
+                        MDLabel:
+                            text: f"{root.product_rating}/5 ({root.review_count} reviews)"
+                            theme_text_color: "Secondary"
+                            font_style: "Body"
+                            role: "medium"
+                            adaptive_height: True
+
+                MDDivider:
+                    color: hex("#E5E7EB")
+
+                # --- SECTION REVIEWS ---
+                MDBoxLayout:
+                    adaptive_height: True
+                    spacing: "10dp"
+                    MDLabel:
+                        text: "Ulasan Pengguna"
+                        font_style: "Title"
+                        role: "large"
+                        bold: True
+                        adaptive_height: True
                         pos_hint: {"center_y": .5}
-                    Widget:
+                    
+                    MDWidget:
+                        
                     MDButton:
                         style: "filled"
                         theme_bg_color: "Custom"
                         md_bg_color: hex("#4F46E5")
                         on_release: root.show_add_review_dialog()
+                        radius: [20,]
                         MDButtonIcon:
-                            icon: "plus"
+                            icon: "pencil"
                             theme_icon_color: "Custom"
                             icon_color: 1,1,1,1
                         MDButtonText:
-                            text: "Tambah Review"
+                            text: "Tulis Review"
                             theme_text_color: "Custom"
                             text_color: 1,1,1,1
 
@@ -440,29 +430,46 @@ KV = '''
                     id: review_list
                     orientation: "vertical"
                     adaptive_height: True
-                    spacing: "0dp"
+                    spacing: "16dp"
+
+    # Floating Back Button
+    MDIconButton:
+        icon: "arrow-left"
+        style: "filled"
+        pos_hint: {"top": 0.96, "left": 0.04}
+        theme_bg_color: "Custom"
+        md_bg_color: 1,1,1,1
+        theme_icon_color: "Custom"
+        icon_color: hex("#1F2937")
+        elevation: 2
+        on_release: app.go_back()
 
 <ReviewItem>:
     orientation: "vertical"
     adaptive_height: True
-    padding: [0, "16dp", 0, "16dp"]
-    spacing: "8dp"
+    padding: "16dp"
+    spacing: "12dp"
+    md_bg_color: 1, 1, 1, 1
+    radius: [12,]
+    elevation: 1 # Shadow card for review
     
     MDBoxLayout:
         spacing: "12dp"
         adaptive_height: True
+        
         MDCard:
             size_hint: None, None
             size: "40dp", "40dp"
             radius: [20,]
-            md_bg_color: hex("#E0E7FF")
+            md_bg_color: hex("#EEF2FF")
             elevation: 0
             MDIcon:
-                icon: "account"
+                icon: "account-circle"
                 halign: "center"
                 pos_hint: {"center_y": .5}
                 theme_text_color: "Custom"
                 text_color: hex("#4F46E5")
+                font_size: "24sp"
         
         MDBoxLayout:
             orientation: "vertical"
@@ -475,7 +482,7 @@ KV = '''
                 role: "large"
                 adaptive_height: True
                 theme_text_color: "Custom"
-                text_color: hex("#1F2937")
+                text_color: hex("#111827")
             StarRating:
                 rating: root.rating
 
@@ -486,16 +493,12 @@ KV = '''
         theme_text_color: "Custom"
         text_color: hex("#4B5563")
         adaptive_height: True
-        padding: ["52dp", 0, 0, 0]
-
-    MDDivider:
-        color: hex("#F3F4F6")
         
 <AddReviewContent>:
     orientation: "vertical"
     spacing: "12dp"
     size_hint_y: None
-    height: "220dp"
+    height: "240dp"
     
     MDLabel:
         text: "Berikan Rating:"
@@ -547,11 +550,11 @@ KV = '''
         radius: [8,]
         padding: "8dp"
         size_hint_y: None
-        height: "100dp"
+        height: "120dp"
         
         TextInput:
             id: review_text
-            hint_text: "Ceritakan pengalaman Anda..."
+            hint_text: "Ceritakan pengalaman Anda... (Minimal 10 karakter)"
             background_color: 0,0,0,0
             foreground_color: 0,0,0,1
             cursor_color: 0,0,0,1
