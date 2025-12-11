@@ -20,15 +20,12 @@ class EditGoalContent(MDBoxLayout):
     pass
 
 class SavingsScreen(MDScreen):
-    goal_name = StringProperty('iPhone 15 Pro')
-    target_amount = NumericProperty(15000000)
-    current_amount = NumericProperty(6000000)
+    goal_name = StringProperty('Belum Ada Target')
+    target_amount = NumericProperty(0)
+    current_amount = NumericProperty(0)
     progress_percent = NumericProperty(0)
     
-    history_data = ListProperty([
-        {'amount': 100000, 'date': '2024-11-29'},
-        {'amount': 25000, 'date': '2024-11-28'},
-    ])
+    history_data = ListProperty([])
 
     def on_enter(self):
         quick_amounts = [10000, 25000, 50000, 100000, 250000, 500000]

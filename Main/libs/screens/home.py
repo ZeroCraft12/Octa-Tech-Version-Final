@@ -1,288 +1,421 @@
-from kivy.core.window import Window
-
-# 1. Set Ukuran Layar
- #Window.size = (1000, 600)
-
+from kivy.lang import Builder
 from kivy.metrics import dp
 from kivy.utils import get_color_from_hex
-from kivy.uix.scrollview import ScrollView
+from kivy.properties import StringProperty, ColorProperty, ObjectProperty
 from kivy.uix.behaviors import ButtonBehavior
+from kivy.uix.image import Image
+from kivy.uix.carousel import Carousel
 
-# Komponen KivyMD 2.0+
 from kivymd.app import MDApp
 from kivymd.uix.screen import MDScreen
-from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.gridlayout import MDGridLayout
 from kivymd.uix.card import MDCard
-from kivymd.uix.label import MDLabel
-from kivymd.uix.button import MDIconButton
-# Tambahkan import ini
-from kivy.uix.image import Image
-from kivy.uix.behaviors import ButtonBehavior
+from kivymd.uix.boxlayout import MDBoxLayout
 
-# Buat Class Tombol Gambar Sendiri (Lebih Stabil daripada MDIconButton untuk Logo)
+# --- WARNA DI PYTHON (Bisa diakses juga di KV jika diimport/set dynamic) ---
+COLOR_OCTA_BLUE = "#1A2B58"
+COLOR_BG_GREY = "#F5F5F5"
+COLOR_WHITE = "#FFFFFF"
+COLOR_ACCENT = "#FFD700"
+
+KV = '''
+#:import get_color_from_hex kivy.utils.get_color_from_hex
+#:import Carousel kivy.uix.carousel.Carousel
+
+<LogoButton>:
+    size_hint: None, None
+    size: dp(40), dp(40)
+    pos_hint: {"center_y": 0.5}
+
+<HeroSlide>:
+    size_hint_y: None
+    height: dp(160)
+    radius: [dp(15),]
+    elevation: 2
+    padding: dp(20)
+    spacing: dp(10)
+    theme_bg_color: "Custom"
+    md_bg_color: root.bg_color
+    
+    MDBoxLayout:
+        orientation: "vertical"
+        
+        MDLabel:
+            text: root.title
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            font_style: "Headline"
+            role: "small"
+            bold: True
+            
+        MDLabel:
+            text: root.subtitle
+            theme_text_color: "Custom"
+            text_color: 1, 1, 1, 1
+            font_style: "Body"
+            role: "medium"
+
+<ModernMenuButton>:
+    orientation: "vertical"
+    size_hint_y: None
+    height: dp(110)
+    radius: [dp(15),]
+    elevation: 2
+    ripple_behavior: True
+    padding: dp(10)
+    spacing: dp(5)
+    theme_bg_color: "Custom"
+    md_bg_color: 1, 1, 1, 1
+
+    MDBoxLayout:
+        size_hint: None, None
+        size: dp(50), dp(50)
+        radius: [dp(25),]
+        md_bg_color: root.icon_bg_color
+        pos_hint: {"center_x": 0.5}
+        
+        MDIconButton:
+            icon: root.icon_name
+            theme_icon_color: "Custom"
+            icon_color: 1, 1, 1, 1
+            pos_hint: {"center_x": 0.5, "center_y": 0.5}
+            font_size: "24sp"
+
+    MDLabel:
+        text: root.text_label
+        halign: "center"
+        theme_text_color: "Primary"
+        bold: True
+        font_style: "Label"
+        role: "large"
+        adaptive_height: True
+
+<FeaturedProductCard>:
+    orientation: "vertical"
+    size_hint: None, None
+    size: dp(160), dp(220)
+    radius: [dp(15),]
+    elevation: 2
+    ripple_behavior: True
+    theme_bg_color: "Custom"
+    md_bg_color: 1, 1, 1, 1
+    padding: dp(0)
+    
+    MDBoxLayout:
+        size_hint_y: 0.6
+        radius: [dp(15), dp(15), 0, 0]
+        Image:
+            source: root.product_image
+            keep_ratio: True
+            allow_stretch: True
+            
+    MDBoxLayout:
+        orientation: "vertical"
+        padding: dp(10)
+        size_hint_y: 0.4
+        
+        MDLabel:
+            text: root.product_name
+            bold: True
+            font_style: "Label"
+            role: "large"
+            max_lines: 1
+            shorten: True
+            adaptive_height: True
+            
+        MDLabel:
+            text: root.product_category
+            font_style: "Body"
+            role: "small"
+            theme_text_color: "Secondary"
+            adaptive_height: True
+            
+        MDBoxLayout:
+            orientation: "horizontal"
+            spacing: dp(2)
+            adaptive_height: True
+            
+            MDIconButton:
+                icon: "star"
+                theme_icon_color: "Custom"
+                icon_color: get_color_from_hex("#FFD700")
+                font_size: "14sp"
+                size_hint: None, None
+                size: dp(16), dp(16)
+                pos_hint: {"center_y": 0.5}
+                
+            MDLabel:
+                text: root.product_rating
+                font_style: "Label"
+                role: "small"
+                theme_text_color: "Secondary"
+                adaptive_height: True
+                pos_hint: {"center_y": 0.5}
+
+<HomeScreen>:
+    md_bg_color: get_color_from_hex("#F5F5F5")
+    
+    MDBoxLayout:
+        orientation: "vertical"
+        
+        # --- HEADER ---
+        MDBoxLayout:
+            orientation: "horizontal"
+            adaptive_height: True
+            padding: dp(20), dp(10)
+            spacing: dp(10)
+            md_bg_color: 1, 1, 1, 1
+            
+            LogoButton:
+                source: "D:/Project Pemdas Octatech test/Main/Assets/Images/logonontext.png"
+                
+            MDLabel:
+                text: "OctaTech."
+                bold: True
+                theme_text_color: "Primary"
+                font_style: "Title"
+                role: "medium"
+                adaptive_width: True
+                pos_hint: {"center_y": 0.5}
+                
+            MDLabel: # Spacer
+            
+            MDIconButton:
+                icon: "account-circle-outline"
+                on_release: root.to_profile()
+                
+            MDIconButton:
+                icon: "logout"
+                on_release: root.do_logout()
+                
+        # --- CONTENT ---
+        ScrollView:
+            bar_width: 0
+            
+            MDBoxLayout:
+                orientation: "vertical"
+                padding: dp(20), dp(10)
+                spacing: dp(20)
+                adaptive_height: True
+                
+                # Greeting
+                MDBoxLayout:
+                    orientation: "vertical"
+                    adaptive_height: True
+                    spacing: dp(5)
+                    
+                    MDLabel:
+                        id: lbl_hello
+                        text: "Hai, User!"
+                        font_style: "Headline"
+                        role: "small"
+                        bold: True
+                        theme_text_color: "Primary"
+                        adaptive_height: True
+                        
+                    MDLabel:
+                        text: "Temukan gadget impianmu hari ini."
+                        font_style: "Body"
+                        role: "medium"
+                        theme_text_color: "Secondary"
+                        adaptive_height: True
+                        
+                # Hero Carousel Container
+                MDCard:
+                    size_hint_y: None
+                    height: dp(160)
+                    radius: [dp(15),]
+                    elevation: 2
+                    id: carousel_container
+                    # Carousel removed from here to be added safely in code or strict KV if 'clip_children' issue persists
+                    # We will add Carousel dynamically in python to be safe OR use Carousel directly here
+                    
+                    Carousel:
+                        id: hero_carousel
+                        loop: True
+                        anim_move_duration: 0.5
+                        
+                # Menu Grid
+                MDGridLayout:
+                    cols: 2
+                    adaptive_height: True
+                    spacing: dp(15)
+                    
+                    ModernMenuButton:
+                        icon_name: "compass-outline"
+                        text_label: "Rekomendasi"
+                        icon_bg_color: get_color_from_hex("#E91E63")
+                        on_release: root.to_rekomendasi()
+                        
+                    ModernMenuButton:
+                        icon_name: "piggy-bank-outline"
+                        text_label: "Tabungan"
+                        icon_bg_color: get_color_from_hex("#4CAF50")
+                        on_release: root.to_savings()
+                        
+                    ModernMenuButton:
+                        icon_name: "star-outline"
+                        text_label: "Review"
+                        icon_bg_color: get_color_from_hex("#FF9800")
+                        on_release: root.to_review()
+                        
+                    ModernMenuButton:
+                        icon_name: "heart-outline"
+                        text_label: "Wishlist"
+                        icon_bg_color: get_color_from_hex("#9C27B0")
+                        on_release: root.to_wishlist()
+                        
+                # Featured Text
+                MDLabel:
+                    text: "Produk Unggulan"
+                    bold: True
+                    font_style: "Title"
+                    role: "medium"
+                    adaptive_height: True
+                    theme_text_color: "Primary"
+                    
+                # Featured Scroll
+                ScrollView:
+                    size_hint_y: None
+                    height: dp(230)
+                    do_scroll_x: True
+                    do_scroll_y: False
+                    bar_width: 0
+                    
+                    MDBoxLayout:
+                        id: product_row
+                        orientation: "horizontal"
+                        padding: dp(5), dp(5)
+                        spacing: dp(15)
+                        adaptive_width: True
+                
+                MDLabel:
+                    size_hint_y: None
+                    height: dp(20)
+'''
+
+Builder.load_string(KV)
+
+# --- CLASSES ---
+
 class LogoButton(ButtonBehavior, Image):
     pass
 
-# --- WARNA ---
-COLOR_OCTA_BLUE = get_color_from_hex("#1A2B58") # Biru Tua Pekat
-COLOR_BG_GREY = get_color_from_hex("#F5F5F5")   # Abu-abu Background
-COLOR_WHITE = get_color_from_hex("#FFFFFF")     # Putih Bersih
+class HeroSlide(MDCard):
+    title = StringProperty("")
+    subtitle = StringProperty("")
+    bg_color = ColorProperty([0,0,0,0])
 
+class ModernMenuButton(MDCard):
+    icon_name = StringProperty("")
+    text_label = StringProperty("")
+    icon_bg_color = ColorProperty([0,0,0,0])
 
-class LogoButton(ButtonBehavior, Image):
-    pass
-# --- 1. HEADER BUTTON ---
-class HeaderButton(ButtonBehavior, MDBoxLayout):
-    def __init__(self, icon_name, text_label, callback_func, **kwargs):
-        super().__init__(**kwargs)
-        self.orientation = 'vertical'
-        self.adaptive_width = True
-        self.spacing = dp(4)
-        self.padding = dp(4)
-        self.callback = callback_func
-        
-        btn_icon = MDIconButton(
-            icon=icon_name,
-            theme_icon_color="Custom",
-            icon_color=COLOR_WHITE,
-            pos_hint={"center_x": 0.5},
-            font_size="30sp", 
-        )
-        
-        lbl_text = MDLabel(
-            text=text_label,
-            halign="center",
-            theme_text_color="Custom",
-            text_color=COLOR_WHITE,
-            font_style="Label",
-            role="small",
-            adaptive_height=True
-        )
-        self.add_widget(btn_icon)
-        self.add_widget(lbl_text)
+class FeaturedProductCard(MDCard):
+    product_image = StringProperty("")
+    product_name = StringProperty("")
+    product_category = StringProperty("")
+    product_rating = StringProperty("0.0")
+    product_id = ObjectProperty(None)
     
     def on_release(self):
-        """Override on_release untuk panggil callback dengan self"""
-        if self.callback:
-            self.callback(self)
+        app = MDApp.get_running_app()
+        if hasattr(app, 'show_product_detail') and self.product_id:
+            app.show_product_detail(self.product_id)
 
-# --- 2. MENU CARD (FIX WARNA) ---
-class MenuCard(MDCard):
-    def __init__(self, icon_name, title_text, on_tap=None, **kwargs):
-        super().__init__(**kwargs)
-        
-        # --- PERBAIKAN UTAMA ---
-        # Kita JANGAN pakai style="elevated" karena itu memaksa jadi putih.
-        # Kita kosongkan style atau pakai "outlined" tapi border 0 agar warna custom masuk.
-        
-        self.theme_bg_color = "Custom"      # Aktifkan mode custom
-        self.md_bg_color = COLOR_OCTA_BLUE  # Paksa Warna Biru
-        
-        # Tambahan agar tetap cantik (radius & bayangan)
-        self.radius = [dp(15), dp(15), dp(15), dp(15)]
-        self.padding = dp(20)
-        self.size_hint_y = None
-        self.height = dp(160)
-        self.ripple_behavior = True
-        self.elevation = 2 # Tambah bayangan manual
-        
-        layout = MDBoxLayout(orientation="vertical", spacing=dp(10))
-        
-        # IKON PUTIH
-        icon = MDIconButton(
-            icon=icon_name,
-            theme_icon_color="Custom",
-            icon_color=COLOR_WHITE,    
-            pos_hint={"center_x": 0.5},
-            font_size="56sp", 
-        )
-        
-        # TEKS PUTIH
-        label = MDLabel(
-            text=title_text,
-            halign="center",
-            theme_text_color="Custom",
-            text_color=COLOR_WHITE,
-            bold=True,
-            font_style="Title",
-            adaptive_height=True
-        )
-        
-        layout.add_widget(MDLabel()) # Spacer
-        layout.add_widget(icon)
-        layout.add_widget(label)
-        layout.add_widget(MDLabel()) # Spacer
-        
-        self.add_widget(layout)
-        
-        # Bind click handler if provided
-        if on_tap:
-            self.bind(on_release=on_tap)
-
-# --- HALAMAN UTAMA ---
 class HomeScreen(MDScreen):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.md_bg_color = COLOR_BG_GREY
-        
-        root_layout = MDBoxLayout(orientation='vertical')
-        
-        # HEADER (Biru Tua)
-        header_container = MDCard(
-            radius=[0, 0, dp(30), dp(30)], 
-            md_bg_color=COLOR_OCTA_BLUE,
-            theme_bg_color="Custom", 
-            elevation=0,
-            size_hint_y=None,
-            height=dp(110)
-        )
-        
-        header_content = MDBoxLayout(
-            orientation='horizontal', 
-            padding=[dp(20), dp(10), dp(20), dp(10)]
-        )
-        
-        # Logo Kiri
-        # Jangan gunakan adaptive_width=True di logo_box agar ukuran ikon bisa diatur eksplisit
-        logo_box = MDBoxLayout(orientation='horizontal', spacing=dp(5))
-        # Tetapkan ukuran eksplisit untuk ikon agar dapat diperbesar
-        # --- GANTI BAGIAN LOGO_ICON DENGAN INI ---
-        
-        # Kita pakai LogoButton buatan sendiri agar ukuran bisa diatur bebas
-        logo_icon = LogoButton(
-            # Ganti backslash (\) dengan slash (/) agar tidak warning SyntaxError
-            source="D:/Project Pemdas Octatech test/Main/Assets/Images/logonontext.png",
-            
-            # Ukuran tombol dan gambar
-            size_hint=(None, None),
-            size=(dp(60), dp(60)), 
-            
-            # Posisi
-            pos_hint={"center_y": 0.5},
-            
-            # (Opsional) Jika ingin warna asli gambar, hapus baris color ini
-            # Jika logo aslinya hitam dan mau jadi putih, biarkan ini:
-            color=COLOR_WHITE 
-        )
-        
-        # Tambahkan fungsi ketika diklik (jika perlu)
-        logo_icon.on_release = lambda: print("Logo ditekan!")
-        logo_text = MDLabel(
-            text="Octa\nTech.",
-            theme_text_color="Custom",
-            text_color=COLOR_WHITE,
-            bold=True,
-            adaptive_size=True,
-            pos_hint={"center_y": 0.5}
-        )
-        logo_box.add_widget(logo_icon)
-        logo_box.add_widget(logo_text)
-        
-        # Menu Kanan
-        btn_profile = HeaderButton("account-circle", "Nama", self.to_profile)
-        btn_logout = HeaderButton("logout", "Log out", self.do_logout)
-        
-        
-        right_menu = MDBoxLayout(orientation='horizontal', spacing=dp(10), adaptive_width=True)
-        right_menu.add_widget(btn_profile)
-        right_menu.add_widget(btn_logout)
-        
-        header_content.add_widget(logo_box)
-        header_content.add_widget(MDLabel())
-        header_content.add_widget(right_menu)
-        
-        header_container.add_widget(header_content)
-        
-        # BODY SCROLL
-        scroll = ScrollView()
-        
-        body_content = MDBoxLayout(
-            orientation='vertical',
-            padding=dp(20),
-            spacing=dp(20),
-            adaptive_height=True
-        )
-        
-        body_content.add_widget(MDLabel(size_hint_y=None, height=dp(10)))
-        
-        self.lbl_hello = MDLabel(
-            text="Halo, nama!",
-            halign="center",
-            font_style="Headline",
-            role="medium",
-            bold=True,
-            adaptive_height=True,
-            theme_text_color="Primary"
-)
+    built_once = False
 
-        lbl_desc = MDLabel(text="Selamat datang di aplikasi Octa Tech.\nSilakan pilih menu di bawah ini.", halign="center", theme_text_color="Secondary", adaptive_height=True)
+    def on_enter(self):
+        # Update username
+        app = MDApp.get_running_app()
+        if hasattr(app, "user_nama"):
+            name = app.user_nama if app.user_nama else "User"
+            self.ids.lbl_hello.text = f"Hai, {name}!"
+            
+        if not self.built_once:
+            self.setup_carousel()
+            self.load_featured_products()
+            self.built_once = True
+            
+            # Apply clip_children manually if needed for container
+            self.ids.carousel_container.clip_children = True
+
+    def setup_carousel(self):
+        # We need to add slides dynamically or definition in KV? 
+        # Since usage is simple, let's add them here to keep data separate from view
+        carousel = self.ids.hero_carousel
         
-        # GRID MENU (4 Kolom)
-        menu_grid = MDGridLayout(
-            cols=4,
-            spacing=dp(20),
-            adaptive_height=True,
-            padding=[dp(10), dp(30), dp(10), dp(20)]
+        slide1 = HeroSlide(
+            title="Promo Spesial", 
+            subtitle="Diskon hingga 20% untuk Laptop Gaming!",
+            bg_color=get_color_from_hex("#3F51B5")
+        )
+        slide2 = HeroSlide(
+            title="Rekomendasi Terbaik", 
+            subtitle="Cari tahu gadget yang cocok untukmu.",
+            bg_color=get_color_from_hex("#009688")
+        )
+        slide3 = HeroSlide(
+            title="OctaTech Savings", 
+            subtitle="Mulai menabung untuk gadget impian.",
+            bg_color=get_color_from_hex("#1A2B58")
         )
         
-        # ISI CARD (Harusnya sekarang Biru Tua)
-        menu_grid.add_widget(MenuCard("checkbox-marked-circle-outline", "Rekomendasi", on_tap=self.to_rekomendasi))
-        menu_grid.add_widget(MenuCard("piggy-bank-outline", "Tabungan", on_tap=self.to_savings))
-        menu_grid.add_widget(MenuCard("star-outline", "Review", on_tap=self.to_review))
-        menu_grid.add_widget(MenuCard("heart-outline", "Wishlist", on_tap=self.to_wishlist))
-        
-        body_content.add_widget(self.lbl_hello)
-        body_content.add_widget(lbl_desc)
-        body_content.add_widget(menu_grid)
-        
-        scroll.add_widget(body_content)
-        
-        root_layout.add_widget(header_container)
-        root_layout.add_widget(scroll)
-        
-        self.add_widget(root_layout)
+        carousel.add_widget(slide1)
+        carousel.add_widget(slide2)
+        carousel.add_widget(slide3)
 
-    def to_profile(self, instance):
-        print(f"DEBUG: to_profile dipanggil, manager = {self.manager}")
+    def load_featured_products(self):
+        app = MDApp.get_running_app()
+        products_to_show = getattr(app, 'products', [])[:5]
+        row = self.ids.product_row
+        row.clear_widgets()
+        
+        if not products_to_show:
+            lbl = MDLabel(text="Belum ada data produk.", adaptive_width=True)
+            row.add_widget(lbl)
+        else:
+            for p in products_to_show:
+                # Calculate rating string
+                rating_val = 0
+                reviews = p.get('reviews', [])
+                if reviews:
+                    total = sum(r['rating'] for r in reviews)
+                    rating_val = round(total / len(reviews), 1)
+                
+                card = FeaturedProductCard()
+                card.product_image = p.get('image', '')
+                card.product_name = p.get('name', 'Produk')
+                card.product_category = p.get('category', 'Kategori')
+                card.product_rating = str(rating_val)
+                card.product_id = p.get('id')
+                
+                row.add_widget(card)
+
+    def to_profile(self):
         if self.manager:
             self.manager.current = "profile_screen"
             self.manager.transition.direction = "left"
-            print("DEBUG: Navigasi ke profile_screen berhasil")
-        else:
-            print("DEBUG: ERROR - manager None!")
-    
-    def to_rekomendasi(self, instance):
-        """Navigate to the recommendation screen."""
+
+    def to_rekomendasi(self):
         if self.manager:
             self.manager.current = "rekomendasi_gadget"
             self.manager.transition.direction = "left"
-            
-    def to_review(self, instance):
-        """Navigate to the review screen."""
+
+    def to_review(self):
         if self.manager:
             self.manager.current = "review_screen"
             self.manager.transition.direction = "left"
 
-    def to_savings(self, instance):
-        """Navigate to the savings screen."""
+    def to_savings(self):
         if self.manager:
             self.manager.current = "savings_screen"
             self.manager.transition.direction = "left"
-    
-    def to_wishlist(self, instance):
-        """Navigate to the wishlist screen."""
+
+    def to_wishlist(self):
         if self.manager:
             self.manager.current = "wishlist_screen"
             self.manager.transition.direction = "left"
 
-    def do_logout(self, instance):
-        print("Logout...")
+    def do_logout(self):
         MDApp.get_running_app().stop()
-
-    def on_pre_enter(self):
-       app = MDApp.get_running_app()
-       if hasattr(app, "user_nama"):
-        self.lbl_hello.text = f"Halo, {app.user_nama}!"
-
-

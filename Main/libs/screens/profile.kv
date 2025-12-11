@@ -7,230 +7,192 @@
     MDTextField:
         id: new_password
         mode: "outlined"
-        password: True
         MDTextFieldHintText:
             text: "Password Baru"
 
     MDTextField:
         id: confirm_password
         mode: "outlined"
-        password: True
         MDTextFieldHintText:
             text: "Konfirmasi Password"
 
 <ProfileScreen>:
-    # --- Pengaturan Dasar Layar ---
-    md_bg_color: [0.92, 0.94, 0.98, 1]  # Warna background biru muda
+    md_bg_color: [0.98, 0.98, 0.98, 1]  # Very light grey background
 
-    # --- 1. Header Navigasi (Bagian Atas) ---
     MDBoxLayout:
-        adaptive_height: True
-        pos_hint: {"top": 1}
-        padding: "20dp"
-        spacing: "10dp"
-        
-        # Tombol Kiri (Home)
-        MDButton:
-            style: "text"
-            pos_hint: {"center_y": .5}
-            theme_width: "Custom"
-            width: "180dp"
-            on_release: root.back_to_home()
-            
-            MDButtonIcon:
-                icon: "home-outline"
-                theme_icon_color: "Custom"
-                icon_color: "blue"
-                
-            MDButtonText:
-                text: "Kembali ke Home"
-                theme_text_color: "Custom"
-                text_color: "blue"
-                font_style: "Label"
-                role: "large"
-                
+        orientation: "vertical"
 
-        MDWidget: # Spacer (Pendorong agar tombol logout ke kanan)
-
-        # Tombol Kanan (Logout)
-        MDButton:
-            style: "text"
-            pos_hint: {"center_y": .5}
-            on_release: root.logout()
-            
-            MDButtonIcon:
-                icon: "logout"
-                theme_icon_color: "Custom"
-                icon_color: "red"
-                
-            MDButtonText:
-                text: "Logout"
-                theme_text_color: "Custom"
-                text_color: "red"
-                font_style: "Label"
-                role: "large"
-
-    # --- 2. Kartu Utama (Bagian Tengah) ---
-    MDCard:
-        size_hint: None, None
-        size: "450dp", "600dp"
-        pos_hint: {"center_x": .5, "center_y": .5}
-        padding: "24dp"
-        radius: [20, ]
-        elevation: 1
-        md_bg_color: "white"
-        
+        # --- Custom Top App Bar ---
         MDBoxLayout:
-            orientation: "vertical"
-            spacing: "16dp"
-
-            # Judul Halaman
-            MDLabel:
-                text: "Profil Saya"
-                halign: "center"
-                font_style: "Headline"
-                role: "medium"
-                adaptive_height: True
-                bold: True
-
-            # Area Foto Profil (Menggunakan RelativeLayout untuk menumpuk ikon kamera)
-            MDRelativeLayout:
+            adaptive_height: True
+            padding: "12dp"
+            spacing: "12dp"
+            md_bg_color: [1, 1, 1, 1]
+            
+            # Back Button
+            MDButton:
+                style: "text"
+                theme_width: "Custom"
                 size_hint: None, None
-                size: "120dp", "120dp"
-                pos_hint: {"center_x": .5}
+                size: "48dp", "48dp"
+                pos_hint: {"center_y": .5}
+                on_release: root.back_to_home()
+                
+                MDButtonIcon:
+                    icon: "arrow-left"
+                    pos_hint: {"center_x": .5, "center_y": .5}
 
-                # Lingkaran Foto
-                MDCard:
-                    size_hint: 1, 1
-                    radius: [self.height / 2, ]
-                    md_bg_color: [1, 1, 1, 1]
-                    line_color: [0.7, 0.7, 0.9, 1]
-                    line_width: 2
-                    # Replace placeholder label with an Image so we can set source
-                    FitImage:
-                        id: profile_image
-                        source: ''
-                        size_hint: 1, 1
-                        pos_hint: {"center_x": .5, "center_y": .5}
-
-                # Tombol Kamera (Floating)
-                MDButton:
-                    style: "filled"
-                    theme_width: "Custom"
-                    size_hint: None, None
-                    size: "36dp", "36dp"
-                    radius: [18, ]
-                    pos_hint: {"right": 1, "bottom": 0}
-                    md_bg_color: [0.4, 0.3, 0.9, 1]
-                    on_release: root.open_file_chooser()
-                    MDButtonIcon:
-                        icon: "camera-outline"
-                        theme_icon_color: "Custom"
-                        icon_color: "white"
-                        pos_hint: {"center_x": .5, "center_y": .5}
-
-            # Teks Instruksi Bawah Foto
             MDLabel:
-                text: "Klik ikon kamera untuk upload foto"
-                halign: "center"
-                theme_text_color: "Hint"
-                font_style: "Label"
-                role: "medium"
-                adaptive_height: True
+                text: "My Profile"
+                font_style: "Title"
+                role: "large"
+                bold: True
+                pos_hint: {"center_y": .5}
+                valign: "center"
 
-            # Teks Username (JohnDoe)
-            # --- Username Display (DIPERBAIKI) ---
+            MDButton:
+                style: "text"
+                theme_width: "Custom"
+                size_hint: None, None
+                size: "48dp", "48dp"
+                pos_hint: {"center_y": .5}
+                on_release: root.logout()
+                
+                MDButtonIcon:
+                    icon: "logout"
+                    theme_icon_color: "Custom"
+                    icon_color: "red"
+                    pos_hint: {"center_x": .5, "center_y": .5}
+
+        # --- Main Content ---
+        ScrollView:
+            do_scroll_x: False
+            
             MDBoxLayout:
-                # 1. adaptive_size: True membuat kotak ini mengecil
-                #    mengikuti panjang teks dan ikon (tidak lebar penuh).
-                adaptive_size: True
-                
-                # 2. pos_hint: {"center_x": .5} meletakkan kotak yang sudah
-                #    mengecil tadi tepat di tengah layar.
-                pos_hint: {"center_x": .5}
-                
-                spacing: "8dp"
-
-                MDIcon:
-                    icon: "account-outline"
-                    theme_text_color: "Custom"
-                    text_color: "grey"
-                    # Pastikan ikon di tengah secara vertikal
-                    pos_hint: {"center_y": .5}
-                
-                MDLabel:
-                    id: username_label
-                    text: "JohnDoe"
-                    font_style: "Title"
-                    role: "large"
-                    bold: True
-                    # Label juga harus menyesuaikan ukuran teksnya
-                    adaptive_size: True
-                    pos_hint: {"center_y": .5}
-
-            MDWidget:
-                size_hint_y: None
-                height: "10dp"
-
-            # Form Update Username (Kotak Abu-abu)
-            MDCard:
-                style: "filled"
-                md_bg_color: [0.97, 0.97, 0.97, 1]
-                radius: [8, ]
-                padding: "16dp"
-                adaptive_height: True
                 orientation: "vertical"
-                spacing: "8dp"
+                adaptive_height: True
+                padding: "24dp"
+                spacing: "24dp"
+                
+                # --- Profile Header Section ---
+                MDCard:
+                    style: "elevated"
+                    size_hint: None, None
+                    size: "300dp", "300dp"
+                    pos_hint: {"center_x": .5}
+                    padding: "24dp"
+                    radius: [24,]
+                    orientation: "vertical"
+                    spacing: "16dp"
+                    md_bg_color: [1, 1, 1, 1]
+                    
+                    # Avatar Wrapper
+                    MDRelativeLayout:
+                        size_hint: None, None
+                        size: "140dp", "140dp"
+                        pos_hint: {"center_x": .5}
+                        
+                        MDCard:
+                            size_hint: 1, 1
+                            radius: [70,]
+                            md_bg_color: [0.95, 0.95, 0.95, 1]
+                            clip_children: True
+                            
+                            FitImage:
+                                id: profile_image
+                                source: ""
+                                size_hint: 1, 1
+                                pos_hint: {"center_x": .5, "center_y": .5}
+                        
+                        # Camera Fab
+                        MDButton:
+                            style: "tonal"
+                            theme_width: "Custom" 
+                            size_hint: None, None
+                            width: "40dp"
+                            height: "40dp"
+                            radius: [20,]
+                            pos_hint: {"right": 1, "bottom": 0}
+                            on_release: root.open_file_chooser()
+                            
+                            MDButtonIcon:
+                                icon: "camera"
+                                pos_hint: {"center_x": .5, "center_y": .5}
 
+                    # Username Display
+                    MDBoxLayout:
+                        orientation: "vertical"
+                        adaptive_height: True
+                        spacing: "4dp"
+                        
+                        MDLabel:
+                            id: username_label
+                            text: "Guest"
+                            halign: "center"
+                            font_style: "Headline"
+                            role: "small"
+                            bold: True
+                            adaptive_height: True
+                            
+                        MDLabel:
+                            text: "Member"
+                            halign: "center"
+                            font_style: "Label"
+                            role: "medium"
+                            theme_text_color: "Hint"
+                            adaptive_height: True
+
+                # --- Settings Section ---
                 MDLabel:
-                    text: "Perbarui Username"
-                    font_style: "Label"
-                    role: "small"
+                    text: "Account Settings"
+                    font_style: "Title"
+                    role: "medium"
                     bold: True
                     adaptive_height: True
+                    padding_y: "12dp"
 
-                MDBoxLayout:
+                # Edit Username Card
+                MDCard:
+                    style: "outlined"
                     adaptive_height: True
-                    spacing: "10dp"
+                    padding: "16dp"
+                    radius: [16,]
+                    orientation: "vertical"
+                    spacing: "12dp"
+                    md_bg_color: [1, 1, 1, 1]
+                    theme_line_color: "Custom"
+                    line_color: [0.9, 0.9, 0.9, 1]
 
                     MDTextField:
                         id: new_username_input
-                        mode: "outlined"
-                        size_hint_x: 0.7
+                        mode: "filled"
                         
                         MDTextFieldHintText:
-                            text: "Username baru"
+                            text: "Change Username"
+                        
+                        MDTextFieldLeadingIcon:
+                            icon: "account-edit-outline"
 
                     MDButton:
                         style: "filled"
-                        size_hint_x: 0.3
-                        pos_hint: {"center_y": .5}
-                        md_bg_color: [0.3, 0.2, 0.9, 1]
+                        pos_hint: {"right": 1}
                         on_release: root.update_username()
                         
                         MDButtonText:
-                            text: "Update"
-                            pos_hint: {"center_x": .5, "center_y": .5}
+                            text: "Update Profile"
 
-            MDWidget: # Spacer
-
-            # Tombol Ganti Password (Hitam)
-            MDButton:
-                style: "filled"
-                size_hint_x: 1
-                height: "56dp"
-                md_bg_color: [0.1, 0.15, 0.2, 1]
-                radius: [8, ]
-                pos_hint: {"center_x": .5}
-                on_release: root.show_change_password_dialog()
-                
-                MDButtonIcon:
-                    icon: "lock-outline"
-                    color: "white"
+                # Change Password Button (Full Width)
+                MDButton:
+                    style: "tonal"
+                    pos_hint: {"center_x": .5}
+                    size_hint_x: 1
+                    height: "56dp"
+                    on_release: root.show_change_password_dialog()
                     
-                MDButtonText:
-                    text: "Ganti Password"
-                    text_color: "white"
-                    font_style: "Title"
-                    role: "medium"
+                    MDButtonIcon:
+                        icon: "lock-reset"
+                    
+                    MDButtonText:
+                        text: "Change Password"
+
                     
