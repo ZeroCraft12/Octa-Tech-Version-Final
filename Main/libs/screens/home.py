@@ -206,6 +206,7 @@ KV = '''
                     MDLabel:
                         id: lbl_hello
                         text: "Hai, User!"
+                        font_name:"Poppins-Bold"
                         font_style: "Headline"
                         role: "small"
                         bold: True
@@ -215,6 +216,7 @@ KV = '''
                     MDLabel:
                         text: "Temukan gadget impianmu hari ini."
                         font_style: "Body"
+                        font_name:"LeagueSpartan"
                         role: "medium"
                         theme_text_color: "Secondary"
                         adaptive_height: True
@@ -243,18 +245,21 @@ KV = '''
                     ModernMenuButton:
                         icon_name: "compass-outline"
                         text_label: "Rekomendasi"
+                        font_name:"Poppins-Bold"
                         icon_bg_color: get_color_from_hex("#E91E63")
                         on_release: root.to_rekomendasi()
                         
                     ModernMenuButton:
                         icon_name: "piggy-bank-outline"
                         text_label: "Tabungan"
+                        font_name:"Poppins-Bold"
                         icon_bg_color: get_color_from_hex("#4CAF50")
                         on_release: root.to_savings()
                         
                     ModernMenuButton:
                         icon_name: "star-outline"
                         text_label: "Review"
+                        font_name:"Poppins-Bold"
                         icon_bg_color: get_color_from_hex("#FF9800")
                         on_release: root.to_review()
                         
@@ -262,12 +267,14 @@ KV = '''
                         icon_name: "heart-outline"
                         pos_hint: {"center_x": 0.5}
                         text_label: "Wishlist"
+                        font_name:"Poppins-Bold"
                         icon_bg_color: get_color_from_hex("#9C27B0")
                         on_release: root.to_wishlist()
                         
                 # Featured Text
                 MDLabel:
                     text: "Produk Unggulan"
+                    font_name:"Poppins-Bold"
                     bold: True
                     font_style: "Title"
                     role: "medium"

@@ -30,11 +30,12 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.lang import Builder
 from kivy.core.text import LabelBase
 
-# Register Fonts
-LabelBase.register(name="Montserrat", fn_regular="Main/assets/fonts/Montserrat-Bold.ttf")
-LabelBase.register(name="Poppins", fn_regular="Main/assets/fonts/Poppins-Medium.ttf")
-LabelBase.register(name="Poppins-Bold", fn_regular="Main/assets/fonts/Poppins-Bold.ttf")
-LabelBase.register(name="LeagueSpartan", fn_regular="Main/assets/fonts/LeagueSpartan-Bold.ttf")
+# Register Fonts - Use absolute paths for PyInstaller compatibility
+script_dir = os.path.dirname(os.path.abspath(__file__))
+LabelBase.register(name="Montserrat", fn_regular=os.path.join(script_dir, "Main/assets/fonts/Montserrat-Bold.ttf"))
+LabelBase.register(name="Poppins", fn_regular=os.path.join(script_dir, "Main/assets/fonts/Poppins-Medium.ttf"))
+LabelBase.register(name="Poppins-Bold", fn_regular=os.path.join(script_dir, "Main/assets/fonts/Poppins-Bold.ttf"))
+LabelBase.register(name="LeagueSpartan", fn_regular=os.path.join(script_dir, "Main/assets/fonts/LeagueSpartan-Bold.ttf"))
 
 DB_NAME = "users.db"
 Window.size = (1920, 1080   ) # Ukuran disesuaikan tampilan HP agar pas dengan desain
@@ -101,28 +102,28 @@ class OctaTechApp(MDApp):
         # Screen: Octa 1 (Icon)
         s1 = OctaSplash1(name="octa_1")
         layout1 = MDBoxLayout(md_bg_color=[1,1,1,1]) # Putih
-        layout1.add_widget(Image(source="2.png", allow_stretch=True, keep_ratio=True))
+        layout1.add_widget(Image(source=os.path.join(script_dir, "2.png"), allow_stretch=True, keep_ratio=True))
         s1.add_widget(layout1)
         self.sm.add_widget(s1)
 
         # Screen: Octa 2 (Text)
         s2 = OctaSplash2(name="octa_2")
         layout2 = MDBoxLayout(md_bg_color=[1,1,1,1])
-        layout2.add_widget(Image(source="3.png", allow_stretch=True, keep_ratio=True))
+        layout2.add_widget(Image(source=os.path.join(script_dir, "3.png"), allow_stretch=True, keep_ratio=True))
         s2.add_widget(layout2)
         self.sm.add_widget(s2)
 
         # Screen: Unesa 1 (Logo)
         s3 = UnesaSplash1(name="unesa_1")
         layout3 = MDBoxLayout(md_bg_color=[1,1,1,1])
-        layout3.add_widget(Image(source="4.png", allow_stretch=True, keep_ratio=True))
+        layout3.add_widget(Image(source=os.path.join(script_dir, "4.png"), allow_stretch=True, keep_ratio=True))
         s3.add_widget(layout3)
         self.sm.add_widget(s3)
 
         # Screen: Unesa 2 (DS)
         s4 = UnesaSplash2(name="unesa_2")
         layout4 = MDBoxLayout(md_bg_color=[1,1,1,1])
-        layout4.add_widget(Image(source="5.png", allow_stretch=True, keep_ratio=True))
+        layout4.add_widget(Image(source=os.path.join(script_dir, "5.png"), allow_stretch=True, keep_ratio=True))
         s4.add_widget(layout4)
         self.sm.add_widget(s4)
 
@@ -146,7 +147,7 @@ class OctaTechApp(MDApp):
         self.sm.add_widget(GadgetRecommendationScreen(name="rekomendasi_gadget"))
         self.sm.add_widget(WishlistScreen(name="wishlist_screen"))
         
-        Builder.load_file("Main/libs/screens/profile.kv")
+        Builder.load_file(os.path.join(script_dir, "Main/libs/screens/profile.kv"))
         from Main.libs.screens.profilescreen import ProfileScreen
         self.sm.add_widget(ProfileScreen(name="profile_screen"))
 

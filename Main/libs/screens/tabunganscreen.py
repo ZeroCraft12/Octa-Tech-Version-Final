@@ -7,9 +7,11 @@ from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogButtonCont
 from kivymd.uix.list import MDListItem
 from kivy.properties import StringProperty, NumericProperty, ListProperty
 from datetime import datetime
+import os
 
 # Load the KV file at module import time
-Builder.load_file('Main/libs/screens/savingsscreen.kv')
+kv_file = os.path.join(os.path.dirname(__file__), 'savingsscreen.kv')
+Builder.load_file(kv_file)
 
 class HistoryItem(MDListItem):
     amount_text = StringProperty()

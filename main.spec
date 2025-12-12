@@ -1,69 +1,71 @@
-from kivy_deps import sdl2, glew
-from kivymd import hooks_path as kivymd_hooks_path
-from PyInstaller.utils.hooks import collect_all
+# -*- mode: python ; coding: utf-8 -*-
+from PyInstaller.utils.hooks import collect_all, collect_submodules
 import os
 
-# -*- mode: python ; coding: utf-8 -*-
+# Get the project root directory
+project_root = os.path.dirname(os.path.abspath('main.py'))
 
-# --- COLLECT KIVYMD DATA ---
-# This ensures all KivyMD assets, modules, and dependencies are included
+# Collect ALL KivyMD data, binaries, and submodules using collect_all
 kivymd_datas, kivymd_binaries, kivymd_hiddenimports = collect_all('kivymd')
 
-# --- DEFINE ASSETS ---
-# Include all KV files and asset folders
-# Format: (Source Path, Destination Path)
-added_files = [
-    ('Main/', 'Main/'),
-    ('assets/', 'assets/'),
-    ('user_data.db', '.'),
-]
+# Collect all KivyMD submodules to ensure nothing is missed
+all_kivymd_submodules = collect_submodules('kivymd')
 
-# Merge our assets with KivyMD's
-all_datas = added_files + kivymd_datas
-all_hiddenimports = [
-    'sqlite3',
-    'kivymd.icon_definitions', 
-] + kivymd_hiddenimports
+# Add project-specific data files
+project_datas = [
+    ('Main', 'Main'),  # Include all Main directory contents
+    ('*.png', '.'),    # Include splash screen images
+    ('*.db', '.'),     # Include database files
+    ('*.json', '.'),   # Include JSON data files
+]
 
 a = Analysis(
     ['main.py'],
-    pathex=[os.getcwd()],
+    pathex=[],
     binaries=kivymd_binaries,
-    datas=all_datas,
-    hiddenimports=all_hiddenimports,
-    hookspath=[kivymd_hooks_path],
+    datas=kivymd_datas + project_datas,
+    hiddenimports=[
+        # Explicitly include icon_definitions (critical for KivyMD 2.0+)
+        'kivymd.icon_definitions',
+        'kivymd.icon_definitions.md_icons',
+        # Project screens
+        'Main.libs.screens.login',
+        'Main.libs.screens.signup',
+        'Main.libs.screens.firstpage',
+        'Main.libs.screens.home',
+        'Main.libs.screens.reviewscreen',
+        'Main.libs.screens.tabunganscreen',
+        'Main.libs.screens.rekomendasi_gadget',
+        'Main.libs.screens.wishlistscreen',
+        'Main.libs.screens.profilescreen',
+    ] + kivymd_hiddenimports + all_kivymd_submodules,
+    hookspath=['.'],  # Use custom hook in current directory
     hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
     optimize=0,
 )
+
 pyz = PYZ(a.pure)
 
 exe = EXE(
     pyz,
     a.scripts,
+    a.binaries,
+    a.datas,
     [],
-    exclude_binaries=True,
-    name='OctaTechApp',
+    name='main',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
+    upx_exclude=[],
+    runtime_tmpdir=None,
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-)
-coll = COLLECT(
-    exe,
-    a.binaries,
-    a.datas,
-    *[Tree(p) for p in (sdl2.dep_bins + glew.dep_bins)],
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name='OctaTechApp',
 )

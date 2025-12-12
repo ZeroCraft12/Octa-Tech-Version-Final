@@ -9,12 +9,14 @@
         mode: "outlined"
         MDTextFieldHintText:
             text: "Password Baru"
+            font_name:"Poppins-Bold"
 
     MDTextField:
         id: confirm_password
         mode: "outlined"
         MDTextFieldHintText:
             text: "Konfirmasi Password"
+            font_name:"Poppins-Bold"
 
 <ProfileScreen>:
     md_bg_color: [0.98, 0.98, 0.98, 1]  # Very light grey background
@@ -44,7 +46,7 @@
 
             MDLabel:
                 text: "My Profile"
-                font_style: "Title"
+                font_name:"Poppins-Bold"
                 role: "large"
                 bold: True
                 pos_hint: {"center_y": .5}
@@ -147,6 +149,7 @@
                 # --- Settings Section ---
                 MDLabel:
                     text: "Account Settings"
+                    font_name:"Poppins-Bold"
                     font_style: "Title"
                     role: "medium"
                     bold: True
@@ -196,5 +199,6 @@
                     
                     MDButtonText:
                         text: "Change Password"
+                        font_name:"Poppins-Bold"
 
                     
