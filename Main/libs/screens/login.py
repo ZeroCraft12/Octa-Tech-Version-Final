@@ -70,7 +70,7 @@ class LoginScreen(MDScreen):
             logo = Image(
                 source=logo_path,
                 size_hint=(None, None),
-                size=(dp(200), dp(200)),
+                size=(dp(700), dp(700)),
                 pos_hint={'center_x': 0.5}
             )
             branding_box.add_widget(logo)

@@ -168,7 +168,7 @@ KV = '''
             md_bg_color: 1, 1, 1, 1
             
             LogoButton:
-                source: "D:/Project Pemdas Octatech test/Main/Assets/Images/logonontext.png"
+                source: "Main/assets/Images/logonontext.png"
                 
             MDLabel:
                 text: "OctaTech."

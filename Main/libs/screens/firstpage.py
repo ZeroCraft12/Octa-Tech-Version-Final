@@ -87,16 +87,16 @@ KV = f'''
             pos_hint: {{"center_x": .5}}
             
             TeamCard:
-                image_source: "{IMG_DIR_KV}furry_lover.jpg"
-                name: "Furry Lover"
+                image_source: "{IMG_DIR_KV}p_Fathan.jpg"
+                name: "Fathan Faqrurozi"
             
             TeamCard:
-                image_source: "{IMG_DIR_KV}wowo_subianto.png"
-                name: "Wowo Subianto"
+                image_source: "{IMG_DIR_KV}p_Irfan.jpeg"
+                name: "M. Irfan Pratama"
             
             TeamCard:
-                image_source: "{IMG_DIR_KV}zaidan_alfaisi.png"
-                name: "M. Zaidan"
+                image_source: "{IMG_DIR_KV}p_Zai.png"
+                name: "M. Zaidan Alfaizi"
 
         MDLabel:
             text: "Dosen Pengampu:\\nDr. Atik Wintarti, M.Kom."
