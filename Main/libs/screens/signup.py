@@ -99,7 +99,7 @@ class SignupPage(MDScreen):
             role="medium",
             bold=True,
             theme_text_color="Custom",
-            text_color=(0.1, 0.17, 0.35, 1),
+            text_color=(1, 1, 1, 1),
             adaptive_height=True
         )
         branding_box.add_widget(tagline)
@@ -111,7 +111,7 @@ class SignupPage(MDScreen):
             font_name="Popins-Bold",
             role="medium",
             theme_text_color="Custom",
-            text_color=(0.1, 0.17, 0.35, 1),
+            text_color=(1, 1, 1, 1),
             adaptive_height=True
         )
         branding_box.add_widget(sub_tagline)

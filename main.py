@@ -38,7 +38,7 @@ LabelBase.register(name="Poppins-Bold", fn_regular=os.path.join(script_dir, "Mai
 LabelBase.register(name="LeagueSpartan", fn_regular=os.path.join(script_dir, "Main/assets/fonts/LeagueSpartan-Bold.ttf"))
 
 DB_NAME = "users.db"
-Window.size = (1920, 1080   ) # Ukuran disesuaikan tampilan HP agar pas dengan desain
+Window.size = (1920, 1080) # Ukuran disesuaikan tampilan HP agar pas dengan desain
 
 # =========================================
 # CLASS SPLASH SCREEN (Tambahan Baru)

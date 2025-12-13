@@ -141,6 +141,44 @@ KV = f'''
             text_color: [1, 1, 1, 0.9]
             adaptive_height: True
 
+        # 3 Image Grid
+        MDBoxLayout:
+            orientation: "horizontal"
+            size_hint_y: None
+            height: "180dp"
+            spacing: "10dp"
+            
+            MDCard:
+                radius: [12, 12, 12, 12]
+                elevation: 3
+                
+                FitImage:
+                    source: "{IMG_DIR_KV}slider1.jpg"
+                    radius: [12, 12, 12, 12]
+            
+            MDCard:
+                radius: [12, 12, 12, 12]
+                elevation: 3
+                
+                FitImage:
+                    source: "{IMG_DIR_KV}slider2.jpg"
+                    radius: [12, 12, 12, 12]
+            
+            MDCard:
+                radius: [12, 12, 12, 12]
+                elevation: 3
+                
+                FitImage:
+                    source: "{IMG_DIR_KV}slider3.jpg"
+                    radius: [12, 12, 12, 12]
+            MDCard:
+                radius: [12, 12, 12, 12]
+                elevation: 3
+                
+                FitImage:
+                    source: "{IMG_DIR_KV}slider4.jpg"
+                    radius: [12, 12, 12, 12]    
+        
         MDWidget: # Spacer
 
         MDButton:
@@ -196,3 +234,4 @@ class HeroScreen(MDScreen):
             # As per main.py, login screen name is 'login_screen'
             # But user might have 'hero_screen' -> 'login_screen' flow in main.py
             self.manager.current = "login_screen"
+

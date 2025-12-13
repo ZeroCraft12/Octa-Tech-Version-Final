@@ -70,7 +70,7 @@ class LoginScreen(MDScreen):
             logo = Image(
                 source=logo_path,
                 size_hint=(None, None),
-                size=(dp(700), dp(700)),
+                size=(dp(500), dp(500)),
                 pos_hint={'center_x': 0.5}
             )
             branding_box.add_widget(logo)
@@ -89,7 +89,7 @@ class LoginScreen(MDScreen):
         
         sub_tagline = MDLabel(
             text="Temukan laptop impianmu dengan mudah dan cepat bersama Octa Tech.",
-            font_name="Montserrat",
+            font_name="Poppins-Bold",
             halign="center",
             font_style="Body",
             role="medium",
