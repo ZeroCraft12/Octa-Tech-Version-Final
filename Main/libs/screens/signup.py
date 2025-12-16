@@ -1,11 +1,8 @@
 import os
-
-# Nama file database, pastikan sesuai dengan file yang digunakan aplikasi Anda
 current_file_path_db = os.path.abspath(__file__)
 MAIN_DIR_DB = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path_db)))
 DB_NAME = os.path.join(MAIN_DIR_DB, "user_data.db")
 
-# Inisialisasi database: buat tabel jika belum ada
 def init_db():
     import sqlite3
     try:
@@ -31,7 +28,7 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
 import sqlite3
 from kivy.metrics import dp 
-# Import Widget KivyMD 2.0.0
+
 from kivymd.uix.textfield import (
     MDTextField,
     MDTextFieldHintText,
@@ -41,7 +38,7 @@ from kivymd.uix.button import MDButton, MDButtonText
 from kivymd.uix.fitimage import FitImage
 from kivymd.uix.floatlayout import MDFloatLayout
 from kivy.core.text import LabelBase
-# Bangun path secara portable untuk menghindari escape sequence issues pada Windows
+
 MAIN_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 FONT_PATH = os.path.join(MAIN_DIR, "Assets", "fonts", "Montserrat-Bold.ttf")
 FONT_PATH = os.path.join(MAIN_DIR, "Assets", "fonts", "Poppins-Bold.ttf")
@@ -66,8 +63,6 @@ class SignupPage(MDScreen):
         main_layout = MDBoxLayout(orientation='horizontal')
         
         # --- LEFT SIDE (BRANDING) ---
-        # Reuse text/images or change slightly for variety
-        # Path Correction
         current_file_path = os.path.abspath(__file__)
         MAIN_DIR = os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))
         IMG_DIR = os.path.join(MAIN_DIR, "assets", "Images")
@@ -76,7 +71,6 @@ class SignupPage(MDScreen):
             size_hint_x=0.45
         )
         
-        # Use specific signup BG
         bg_path = os.path.join(IMG_DIR, "bg2.jpg") 
         if os.path.exists(bg_path):
             bg_image = FitImage(source=bg_path)
@@ -254,17 +248,16 @@ class SignupPage(MDScreen):
             return
 
         try:
-            # Buka koneksi lokal di fungsi ini
             with sqlite3.connect(DB_NAME) as conn:
                 cursor = conn.cursor()
                 cursor.execute("INSERT INTO user_data (nama,username, password) VALUES (?,?,?)", (nama,username, password))
                 conn.commit()
             
             self.show_snackbar("Sukses! Silakan Login.")
-            # Reset field
+
             self.input_username.text = ""
             self.input_password.text = ""
-            # Pindah screen
+
             self.manager.current = "login_screen"
             
         except sqlite3.IntegrityError:
@@ -274,7 +267,7 @@ class SignupPage(MDScreen):
         self.manager.current = "login_screen"
 
     def back_to_login(self, instance):
-        # Cek apakah ScreenManager ada sebelum mengaksesnya
+
         if self.manager:
             self.manager.current = "login_screen"
             self.manager.transition.direction = "right"

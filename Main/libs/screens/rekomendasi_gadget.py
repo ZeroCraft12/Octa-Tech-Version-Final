@@ -16,9 +16,7 @@ from kivy.metrics import dp
 from kivy.properties import StringProperty
 from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
 
-# ==========================================
 # 1. DATA HANDLER
-# ==========================================
 class GadgetDataManager:
     def __init__(self, csv_path=None):
         self.df = pd.DataFrame()
@@ -100,10 +98,7 @@ class GadgetDataManager:
             except: pass
         return filtered
 
-# ==========================================
 # 2. KV LAYOUT
-# ==========================================
-
 KV = '''
 #:import hex kivy.utils.get_color_from_hex
 
@@ -519,9 +514,7 @@ KV = '''
 
 Builder.load_string(KV)
 
-# ==========================================
 # 3. CONTROLLER & UI LOGIC
-# ==========================================
 
 class OptionCard(MDCard):
     text_option = StringProperty("")
@@ -616,7 +609,6 @@ class GadgetRecommendationScreen(MDScreen):
         grid = screen.ids.options_grid
         grid.cols = 2 if is_grid else 1
         
-        # Icon selection based on key
         icon = "checkbox-blank-circle-outline"
         if key == "budget": icon = "cash"
         elif key == "cpu": icon = "chip"
@@ -700,7 +692,6 @@ class GadgetRecommendationScreen(MDScreen):
             spec_text += f"• {key}: {val}\n\n"
         scr.ids.detail_specs.text = spec_text
 
-        # [FIX] PENGGUNAAN IMAGE_GALLERY_BOX (SCROLLVIEW) BUKAN CAROUSEL
         gallery_box = scr.ids.image_gallery_box
         gallery_box.clear_widgets()
         
@@ -708,7 +699,6 @@ class GadgetRecommendationScreen(MDScreen):
         for col in ['Image1', 'Image2', 'Image3', 'Image4']:
             path = self.get_image_path(str(row.get(col, '')))
             if path:
-                # Membuat Kartu Gambar 1x1 Besar (320dp agar sesuai kontainer)
                 img_card = MDCard(
                     size_hint=(None, None),
                     size=("320dp", "320dp"),
@@ -726,19 +716,16 @@ class GadgetRecommendationScreen(MDScreen):
         self.step_manager.transition.direction = "left"
         self.step_manager.current = "detail_screen"
 
-    # [FIX] FUNGSI BARU UNTUK WISHLIST
+    # WISHLIST
     def show_detail_from_wishlist(self, item_data):
-        self.current_detail_laptop = item_data # Load data dari wishlist dict
+        self.current_detail_laptop = item_data 
         
-        # Panggil fungsi standard show_detail (dia bisa baca dict/series)
         self.show_detail(item_data)
         
-        # UPDATE GALLERY KHUSUS (OVERRIDE JIKA PATH BEDA)
         scr = self.step_manager.get_screen('detail_screen')
         gallery_box = scr.ids.image_gallery_box
         gallery_box.clear_widgets()
         
-        # Load gambar dari path yang tersimpan di wishlist
         for key in ['img_path_1', 'img_path_2', 'img_path_3', 'img_path_4']:
             path = item_data.get(key)
             if path and os.path.exists(path):
@@ -752,7 +739,6 @@ class GadgetRecommendationScreen(MDScreen):
                 img_card.add_widget(img)
                 gallery_box.add_widget(img_card)
         
-        # Buka layar detail
         self.step_manager.current = "detail_screen"
 
     def add_to_wishlist(self):
@@ -770,17 +756,15 @@ class GadgetRecommendationScreen(MDScreen):
                 nama = str(item_dict.get('Nama', '')).strip()
                 unique_id = f"{brand}_{nama}".replace(" ", "_").lower()
                 
-                # Copy semua data agar lengkap saat dikembalikan
                 wishlist_data = item_dict.copy()
                 
-                # Tambah field wajib
                 wishlist_data.update({
                     'id': unique_id,
                     'name': f"{brand} {nama}",
                     'price': int(item_dict.get('CleanPrice', 0)),
                     'price_text': str(item_dict.get('Harga', '')),
                     'image': self.get_image_path(str(item_dict.get('Image1', ''))),
-                    # Simpan path lengkap semua gambar
+ 
                     'img_path_1': self.get_image_path(str(item_dict.get('Image1', ''))),
                     'img_path_2': self.get_image_path(str(item_dict.get('Image2', ''))),
                     'img_path_3': self.get_image_path(str(item_dict.get('Image3', ''))),

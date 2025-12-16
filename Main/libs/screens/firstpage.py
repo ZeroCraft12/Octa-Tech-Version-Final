@@ -17,8 +17,6 @@ IMG_DIR = os.path.join(ASSETS_DIR, "Images")
 from kivy.properties import StringProperty
 from kivymd.uix.card import MDCard
 
-# ... (rest of imports)
-
 # Normalize paths for KV to avoid issues
 IMG_DIR_KV = IMG_DIR.replace("\\", "/") + "/"
 
@@ -209,15 +207,7 @@ Builder.load_string(KV)
 
 class TeamScreen(MDScreen):
     def on_touch_down(self, touch):
-        # Allow clicking anywhere to proceed, but prioritize logic
         if self.collide_point(*touch.pos):
-            # If touch not handled by children (unlikely here since cards don't have actions), proceed
-            # But wait/check if user wants to just view. 
-            # Original code had tap anywhere to go next. Let's keep it but maybe only on background?
-            # For modern UX, maybe a button is better, but user asked for previous behavior or similar.
-            # Let's add a delay or check if it's a valid touch.
-            # Actually, standard flow: Wait or Tap. 
-            # Let's bind a tap to the screen to move to hero.
             if super().on_touch_down(touch):
                 return True
             
@@ -231,7 +221,5 @@ class HeroScreen(MDScreen):
     def go_to_login(self):
         if self.manager:
             self.manager.transition.direction = "left"
-            # As per main.py, login screen name is 'login_screen'
-            # But user might have 'hero_screen' -> 'login_screen' flow in main.py
             self.manager.current = "login_screen"
 

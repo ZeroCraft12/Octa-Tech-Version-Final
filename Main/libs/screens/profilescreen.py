@@ -9,7 +9,6 @@ from kivymd.uix.snackbar import MDSnackbar, MDSnackbarText
 import os
 import shutil
 
-# Mengatur ukuran window agar mirip tampilan mobile/tablet
 Window.size = (1000, 600)
 
 # Path untuk menyimpan foto profil
@@ -41,14 +40,11 @@ class ProfileScreen(MDScreen):
 
     def on_enter(self, *args):
         app = MDApp.get_running_app()
-        # Default text jika belum login atau property kosong
         username_text = "Guest"
         
-        # Cek apakah property username ada dan tidak kosong
         if hasattr(app, 'username') and app.username:
             username_text = app.username
             
-        # Update label di UI
         if hasattr(self, 'ids') and 'username_label' in self.ids:
             self.ids.username_label.text = username_text
 
@@ -59,7 +55,6 @@ class ProfileScreen(MDScreen):
         content.add_widget(filechooser)
 
         buttons = BoxLayout(size_hint_y=None, height='48dp', spacing='8dp', padding='8dp')
-        # from kivymd.uix.button import MDButton, MDButtonText # Already imported at top
         cancel = MDButton(style='text')
         cancel_text = MDButtonText(text='Batal')
         cancel.add_widget(cancel_text)
@@ -166,12 +161,10 @@ class ProfileScreen(MDScreen):
         pass2 = input2.text
         
         if not pass1 or not pass2:
-            pass # Creating a snackbar here effectively requires passing ref or simple validation
-            # For simplicity just return, but ideally showing error in dialog
+            pass 
             return 
             
         if pass1 != pass2:
-             # Ideally show error
              return
 
         app = MDApp.get_running_app()

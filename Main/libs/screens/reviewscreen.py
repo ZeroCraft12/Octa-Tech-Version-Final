@@ -13,7 +13,6 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.fitimage import FitImage
 from kivymd.uix.divider import MDDivider
 
-# Import komponen Dialog
 from kivymd.uix.dialog import (
     MDDialog,
     MDDialogHeadlineText,
@@ -29,9 +28,7 @@ import random
 
 def load_products():
     products = []
-    # Determine the directory of the current script
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    # Path to CSV file
     csv_path = os.path.join(current_dir, "database(Laptop).csv")
     
     print(f"DEBUG: Attempting to load CSV from {csv_path}")
@@ -39,7 +36,6 @@ def load_products():
         print(f"CRITICAL ERROR: CSV file not found at {csv_path}")
         return []
 
-    # --- DUMMY DATA POOL ---
     dummy_users = [
         "Budi Santoso", "Siti Aminah", "Rizky Pratama", "Dewi Lestari", 
         "Andi Susanto", "Rina Wijaya", "Eko Saputra", "Nurul Hidayah",
@@ -70,17 +66,13 @@ def load_products():
     ]
 
     try:
-        # Use utf-8-sig to handle potential BOM from Excel
         with open(csv_path, mode='r', encoding='utf-8-sig') as file:
-            # Using delimiter ';' as seen in the file content
             reader = csv.DictReader(file, delimiter=';')
             
-            # Debug: Print fieldnames to verify CSV structure
             print(f"DEBUG: CSV Fieldnames: {reader.fieldnames}")
 
             for i, row in enumerate(reader):
                 try:
-                    # Construct absolute path for the image
                     image_filename = row.get('Image1', '').strip()
                     image_path = os.path.join(current_dir, "Laptop", image_filename)
                     if not os.path.exists(image_path):
@@ -93,7 +85,6 @@ def load_products():
                     
                     for _ in range(num_reviews):
                         user = random.choice(dummy_users)
-                        # Biased towards positive ratings for realism/demo
                         rating = random.choices([3, 4, 5], weights=[1, 4, 5], k=1)[0] 
                         
                         if rating >= 4:
@@ -586,7 +577,7 @@ class DetailScreen(MDScreen):
     product_image = StringProperty("")
     product_category = StringProperty("")
     product_rating = NumericProperty(0)
-    review_count = NumericProperty(0) # Perbaikan: Tambahkan properti ini agar tidak error di KV
+    review_count = NumericProperty(0) 
     
     dialog = None
 

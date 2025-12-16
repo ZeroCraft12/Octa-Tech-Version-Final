@@ -11,7 +11,6 @@ from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard
 from kivymd.uix.boxlayout import MDBoxLayout
 
-# --- WARNA DI PYTHON (Bisa diakses juga di KV jika diimport/set dynamic) ---
 COLOR_OCTA_BLUE = "#1A2B58"
 COLOR_BG_GREY = "#F5F5F5"
 COLOR_WHITE = "#FFFFFF"
@@ -347,8 +346,7 @@ class HomeScreen(MDScreen):
             self.setup_carousel()
             self.load_featured_products()
             self.built_once = True
-            
-            # Apply clip_children manually if needed for container
+
             self.ids.carousel_container.clip_children = True
         
         # Start Auto Scroll
@@ -358,8 +356,7 @@ class HomeScreen(MDScreen):
         self._stop_auto_scroll()
 
     def _start_auto_scroll(self):
-        self._stop_auto_scroll() # Ensure no duplicate
-        # Scroll every 3 seconds
+        self._stop_auto_scroll() 
         self._carousel_event = Clock.schedule_interval(self._scroll_carousel, 3)
 
     def _stop_auto_scroll(self):
@@ -372,8 +369,6 @@ class HomeScreen(MDScreen):
         carousel.load_next(mode='next')
 
     def setup_carousel(self):
-        # We need to add slides dynamically or definition in KV? 
-        # Since usage is simple, let's add them here to keep data separate from view
         carousel = self.ids.hero_carousel
         
         slide1 = HeroSlide(
@@ -407,7 +402,6 @@ class HomeScreen(MDScreen):
             row.add_widget(lbl)
         else:
             for p in products_to_show:
-                # Calculate rating string
                 rating_val = 0
                 reviews = p.get('reviews', [])
                 if reviews:

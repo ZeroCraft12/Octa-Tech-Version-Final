@@ -12,13 +12,10 @@ from kivymd.uix.button import MDIconButton, MDButton, MDButtonText
 from kivymd.uix.widget import MDWidget
 from kivymd.uix.fitimage import FitImage 
 
-# --- KONFIGURASI WARNA ---
 COLOR_BG_CARD = get_color_from_hex("#FFFFFF")
 COLOR_TEXT_PRIMARY = get_color_from_hex("#000000")
 
-# ==========================================
 # WISHLIST MANAGER
-# ==========================================
 class WishlistManager:
     def __init__(self, filename="wishlist_data.json"):
         self.filename = filename
@@ -56,9 +53,7 @@ class WishlistManager:
 
 wishlist_manager = WishlistManager()
 
-# ==========================================
 # CUSTOM CARD (BISA DIKLIK)
-# ==========================================
 class WishlistCard(MDCard):
     def __init__(self, index, item_data, delete_callback, view_callback, **kwargs):
         super().__init__(**kwargs)
@@ -71,9 +66,7 @@ class WishlistCard(MDCard):
         self.padding = dp(0)
         self.spacing = dp(0)
         
-        # [PENTING] Aktifkan Ripple agar user tau bisa diklik
         self.ripple_behavior = True
-        # Saat kartu diklik -> Panggil fungsi lihat detail
         self.on_release = lambda: view_callback(item_data)
 
         # --- 1. GAMBAR ---
@@ -125,7 +118,7 @@ class WishlistCard(MDCard):
             size=(dp(30), dp(30)),
             pos_hint={"center_y": .5},
         )
-        # [PENTING] Binding manual agar tidak bentrok dengan klik kartu
+
         btn_delete.bind(on_release=lambda x: delete_callback(index))
         
         action_box.add_widget(btn_delete)
@@ -138,9 +131,7 @@ class WishlistCard(MDCard):
         self.add_widget(img_box)
         self.add_widget(content_box)
 
-# ==========================================
 # UI LAYOUT
-# ==========================================
 WISHLIST_KV = '''
 <WishlistScreen>:
     name: "wishlist_screen"

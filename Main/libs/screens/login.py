@@ -22,7 +22,6 @@ MAIN_DIR = os.path.dirname(libs_dir)
 ASSETS_DIR = os.path.join(MAIN_DIR, "assets")
 IMG_DIR = os.path.join(ASSETS_DIR, "Images")
 
-# --- DATABASE ---
 DB_NAME = "user_data.db"
 
 class LoginScreen(MDScreen):
@@ -31,7 +30,6 @@ class LoginScreen(MDScreen):
         self.name = "login_screen"
 
     def on_enter(self):
-        # Mencegah duplikasi layout saat bolak-balik screen
         if not self.children:
             self.build()
 
@@ -42,7 +40,6 @@ class LoginScreen(MDScreen):
         main_layout = MDBoxLayout(orientation='horizontal')
         
         # --- LEFT SIDE (BRANDING) ---
-        # 40% Width for Desktop Feel
         left_layout = MDFloatLayout(
             size_hint_x=0.45,
             md_bg_color=(1, 1, 1, 1)
@@ -53,8 +50,6 @@ class LoginScreen(MDScreen):
         if os.path.exists(bg_path):
             bg_image = FitImage(source=bg_path)
             left_layout.add_widget(bg_image)
-            
-
 
         # Branding Content
         branding_box = MDBoxLayout(
@@ -108,7 +103,6 @@ class LoginScreen(MDScreen):
             md_bg_color=(1, 1, 1, 1) # White clean background
         )
         
-        # Scrollable Form Container (for smaller screens protection)
         form_container = MDBoxLayout(
             orientation='vertical',
             adaptive_height=True,
@@ -127,7 +121,7 @@ class LoginScreen(MDScreen):
             role="small",
             bold=True,
             theme_text_color="Custom",
-            text_color=(0.1, 0.17, 0.35, 1), # Navy
+            text_color=(0.1, 0.17, 0.35, 1),
             adaptive_height=True
         )
         subtitle_label = MDLabel(
@@ -159,10 +153,8 @@ class LoginScreen(MDScreen):
             password=True
         )
         form_container.add_widget(self.password_field)
-
-        # 3. Actions (Forgot Password? etc - Placeholder)
         
-        # 4. Buttons
+        # 3. Buttons
         button_box = MDBoxLayout(orientation='vertical', adaptive_height=True, spacing="16dp")
         
         btn_signin = MDButton(
@@ -183,7 +175,7 @@ class LoginScreen(MDScreen):
         ))
         button_box.add_widget(btn_signin)
         
-        # 5. Footer (Sign Up Link)
+        # 4. Footer (Sign Up Link)
         footer_box = MDBoxLayout(
             orientation='horizontal',
             adaptive_height=True, 
@@ -211,10 +203,8 @@ class LoginScreen(MDScreen):
         
         form_container.add_widget(button_box)
 
-        # Add form to right layout
         right_layout.add_widget(form_container)
 
-        # Add navigation back (Corner)
         btn_back = MDButton(
             style="text",
             pos_hint={"top": 0.95, "right": 0.95},
@@ -281,7 +271,6 @@ class LoginScreen(MDScreen):
         snackbar.open()    
 
     def bat_to_firstpage(self, instance):
-        # Kembali ke Hero Screen
         if self.manager.has_screen("hero_screen"):
             self.manager.current = "hero_screen"
             self.manager.transition.direction = "right"

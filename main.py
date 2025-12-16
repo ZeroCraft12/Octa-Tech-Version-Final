@@ -11,11 +11,9 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-# --- IMPORTS ---
 from Main.libs.screens.login import LoginScreen
 from Main.libs.screens.signup import SignupPage
-# from Main.libs.screens.firstpage import GadgetHomeScreen # HAPUS INI
-from Main.libs.screens.firstpage import TeamScreen, HeroScreen # Import screen baru
+from Main.libs.screens.firstpage import TeamScreen, HeroScreen
 from Main.libs.screens.home import HomeScreen
 from Main.libs.screens.reviewscreen import ReviewScreen, DetailScreen, ProductCard, INITIAL_PRODUCTS
 from Main.libs.screens.tabunganscreen import SavingsScreen
@@ -30,7 +28,6 @@ from kivymd.uix.boxlayout import MDBoxLayout
 from kivy.lang import Builder
 from kivy.core.text import LabelBase
 
-# Register Fonts - Use absolute paths for PyInstaller compatibility
 script_dir = os.path.dirname(os.path.abspath(__file__))
 LabelBase.register(name="Montserrat", fn_regular=os.path.join(script_dir, "Main/assets/fonts/Montserrat-Bold.ttf"))
 LabelBase.register(name="Poppins", fn_regular=os.path.join(script_dir, "Main/assets/fonts/Poppins-Medium.ttf"))
@@ -38,11 +35,7 @@ LabelBase.register(name="Poppins-Bold", fn_regular=os.path.join(script_dir, "Mai
 LabelBase.register(name="LeagueSpartan", fn_regular=os.path.join(script_dir, "Main/assets/fonts/LeagueSpartan-Bold.ttf"))
 
 DB_NAME = "users.db"
-Window.size = (1920, 1080) # Ukuran disesuaikan tampilan HP agar pas dengan desain
-
-# =========================================
-# CLASS SPLASH SCREEN (Tambahan Baru)
-# =========================================
+Window.size = (1920, 1080) 
 
 # 1. SPLASH OCTA (2.png -> 3.png)
 class OctaSplash1(MDScreen):
@@ -53,12 +46,11 @@ class OctaSplash1(MDScreen):
         self.manager.transition = FadeTransition(duration=0.5)
         self.manager.current = "octa_2"
 
-    def build_ui(self): # Helper jika ingin build manual
+    def build_ui(self):
         pass 
 
 class OctaSplash2(MDScreen):
     def on_touch_down(self, touch):
-        # Klik layar pindah ke Unesa Splash
         if self.collide_point(*touch.pos):
             self.manager.transition = FadeTransition(duration=0.5)
             self.manager.current = "unesa_1"
@@ -76,7 +68,6 @@ class UnesaSplash1(MDScreen):
 
 class UnesaSplash2(MDScreen):
     def on_touch_down(self, touch):
-        # Klik layar pindah ke Team Screen (dari firstpage.py)
         if self.collide_point(*touch.pos):
             self.manager.transition = FadeTransition(duration=0.5)
             self.manager.current = "team_screen"
@@ -84,9 +75,7 @@ class UnesaSplash2(MDScreen):
         return super().on_touch_down(touch)
 
 
-# =========================================
-# MAIN APP CLASS
-# =========================================
+# Main App
 class OctaTechApp(MDApp):
     username = StringProperty("")
     products = ListProperty(INITIAL_PRODUCTS)
@@ -94,11 +83,9 @@ class OctaTechApp(MDApp):
 
     def build(self):
         self.theme_cls.theme_style = "Light"
-        
-        # Gunakan FadeTransition agar perpindahan gambar halus
+        # FadeTransition
         self.sm = MDScreenManager(transition=FadeTransition())
         
-        # --- 1. SETUP SPLASH SCREEN (Manual Build UI Image) ---
         # Screen: Octa 1 (Icon)
         s1 = OctaSplash1(name="octa_1")
         layout1 = MDBoxLayout(md_bg_color=[1,1,1,1]) # Putih
@@ -130,11 +117,8 @@ class OctaTechApp(MDApp):
         # --- 2. SETUP SCREEN DARI FIRSTPAGE.PY ---
         self.sm.add_widget(TeamScreen(name="team_screen")) # Slide Tim
         
-        # Hero Screen perlu logika tombol "Selanjutnya" -> Login
         hero = HeroScreen(name="hero_screen")
-        # Kita bind tombol 'next' di HeroScreen untuk pindah ke Login
-        # (Asumsi di firstpage.py tombolnya punya id atau logic)
-        # Cara simpel: Timpa method on_touch atau logic tombol di firstpage
+
         self.sm.add_widget(hero)
 
         # --- 3. SETUP SCREEN LAINNYA ---
@@ -154,15 +138,12 @@ class OctaTechApp(MDApp):
         return self.sm
 
     def on_start(self):
-        # Filter awal kosong agar semua produk tampil (jika ada logic review)
         if self.root.has_screen('review_screen'):
             self.filter_products("")
 
     def filter_products(self, query):
-        # Debounce: Cancel previous schedule if user is still typing
         if self.search_trigger:
             self.search_trigger.cancel()
-        # Schedule the actual filtering to run after 0.3s
         self.search_trigger = Clock.schedule_once(lambda dt: self._perform_filter_products(query), 0.3)
 
     def _perform_filter_products(self, query):

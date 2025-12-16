@@ -2,7 +2,6 @@ from kivy.lang import Builder
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button import MDButton, MDButtonText
-# Perbaikan: Hapus MDDialogContent dari import karena tidak dikenali di versi Anda
 from kivymd.uix.dialog import MDDialog, MDDialogHeadlineText, MDDialogButtonContainer
 from kivymd.uix.list import MDListItem
 from kivy.properties import StringProperty, NumericProperty, ListProperty
@@ -35,12 +34,9 @@ class SavingsScreen(MDScreen):
         grid.clear_widgets()
         
         for amt in quick_amounts:
-            # Menggunakan style 'outlined' agar terlihat seperti chip/kotak
-            # size_hint_x=1 agar memenuhi kolom grid
             btn = MDButton(style="outlined", size_hint_x=1)
             btn.bind(on_release=lambda x, amount=amt: self.deposit(amount))
             
-            # Format text tombol: +10k, +25k
             display_text = f"+{int(amt/1000)}k"
             btn_text = MDButtonText(text=display_text, pos_hint={"center_x": .5, "center_y": .5})
             
@@ -70,7 +66,6 @@ class SavingsScreen(MDScreen):
 
     def deposit(self, amount):
         self.current_amount += amount
-        # Menambah di index 0 agar muncul paling atas
         self.history_data.insert(0, {
             'amount': amount, 
             'date': datetime.now().strftime("%d %b %Y")
@@ -107,8 +102,6 @@ class SavingsScreen(MDScreen):
         self.dialog_content.ids.edit_name.text = self.goal_name
         self.dialog_content.ids.edit_target.text = str(int(self.target_amount))
 
-        # PERBAIKAN DI SINI:
-        # Langsung masukkan self.dialog_content sebagai argumen kedua tanpa MDDialogContent wrapper
         self.edit_dialog = MDDialog(
             MDDialogHeadlineText(text="Edit Goal"),
             self.dialog_content, 
